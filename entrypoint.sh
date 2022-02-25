@@ -40,11 +40,15 @@ if test -f "/workspace/tfplan"; then
 else
   echo -e "Found no tfplan.  Proceeding with input argument."
 fi
-# change diff character '-' in red into a high unicode character \U1f605 (literally 😅)
+
+# change diff character, a red '-', into a high unicode character \U1f605 (literally 😅)
+# this serves as an intermediate representation representing "diff removal line" as distinct from
+# a raw hyphen which could *also* indicate a yaml list entry.
 INPUT=$(echo "$RAW_INPUT" | sed "s/\x1b\[31m-\x1b\[0m/😅/g")
+
+# now remove all ANSI colors
 INPUT=$(echo "$INPUT" | sed 's/\x1b\[[0-9;]*m//g')
 
-#INPUT=$(echo "$RAW_INPUT" | sed 's/\x1b\[[0-9;]*m//g')
 # Arg 3 is the Terraform CLI exit code
 EXIT_CODE=$3
 
