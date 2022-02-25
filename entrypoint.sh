@@ -40,7 +40,11 @@ if test -f "/workspace/tfplan"; then
 else
   echo -e "Found no tfplan.  Proceeding with input argument."
 fi
-INPUT=$(echo "$RAW_INPUT" | sed 's/\x1b\[[0-9;]*m//g')
+# change diff character '-' in red into a high unicode character \U1f605 (literally 😅)
+INPUT=$(echo "$RAW_INPUT" | sed "s/\x1b\[31m-\x1b\[0m/😅/g")
+INPUT=$(echo "$INPUT" | sed 's/\x1b\[[0-9;]*m//g')
+
+#INPUT=$(echo "$RAW_INPUT" | sed 's/\x1b\[[0-9;]*m//g')
 # Arg 3 is the Terraform CLI exit code
 EXIT_CODE=$3
 
@@ -216,7 +220,8 @@ if [[ $COMMAND == 'plan' ]]; then
       CURRENT_PLAN="${CURRENT_PLAN%$'\n'*}" # trim to the last newline
       PROCESSED_PLAN_LENGTH=$((PROCESSED_PLAN_LENGTH+${#CURRENT_PLAN})) # evaluate length of outbound comment and store
 
-      CURRENT_PLAN=$(echo "$CURRENT_PLAN" | sed -r 's/^([[:blank:]]*)([-+~])/\2\1/g') # Move any diff characters to start of line
+      # Move any diff characters to start of line and then swap our emoji back to a '-'
+      CURRENT_PLAN=$(echo "$CURRENT_PLAN" | sed -r 's/^([[:blank:]]*)([😅+~])/\2\1/g' | sed -r 's/^😅/-/')
       if [[ $COLOURISE == 'true' ]]; then
         CURRENT_PLAN=$(echo "$CURRENT_PLAN" | sed -r 's/^~/!/g') # Replace ~ with ! to colourise the diff in GitHub comments
       fi
