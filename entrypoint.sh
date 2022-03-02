@@ -41,6 +41,10 @@ info () {
   echo -e "\033[34;1mINFO:\033[0m $1"
 }
 
+error () {
+  echo -e "\033[31;1mERROR:\033[0m $1"
+}
+
 make_and_post_payload () {
   # Add plan comment to PR.
   PR_PAYLOAD=$(echo '{}' | jq --arg body "$1" '.body = $body')
@@ -58,14 +62,20 @@ COMMAND=$1
 RAW_INPUT="$COMMENTER_INPUT"
 if test -f "/workspace/tfplan"; then
   info "Found tfplan; showing."
-  pushd workspace > /dev/null || exit 1
-  terraform init 2>&1
+  pushd workspace > /dev/null || (error "Failed to push workspace dir" && exit 1)
+  INIT_OUTPUT="$(terraform init 2>&1)"
+  INIT_RESULT=$?
+  if [ $INIT_RESULT -ne 0 ]; then
+     error "Failed pre-plan init.  Init output: \n$INIT_OUTPUT"
+     exit 1
+  fi
   RAW_INPUT="$( terraform show "tfplan" 2>&1 )"
   SHOW_RESULT=$?
   if [ $SHOW_RESULT -ne 0 ]; then
-     info "Plan failed to show.  Plan output: \n$RAW_INPUT"
+     error "Plan failed to show.  Plan output: \n$RAW_INPUT"
+     exit 1
   fi
-  popd > /dev/null || exit 1
+  popd > /dev/null || (error "Failed to pop workspace dir" && exit 1)
   debug "Plan raw input: $RAW_INPUT"
 else
   info "Found no tfplan.  Proceeding with input argument."
