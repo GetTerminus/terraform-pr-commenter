@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-if [ -z ${COMMENTER_ECHO+x} ]; then
+if [ -n "${COMMENTER_ECHO+x}" ]; then
   set -x
 fi
 
