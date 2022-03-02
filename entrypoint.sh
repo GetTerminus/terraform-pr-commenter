@@ -59,7 +59,7 @@ RAW_INPUT="$COMMENTER_INPUT"
 if test -f "/workspace/tfplan"; then
   info "Found tfplan; showing."
   pushd workspace > /dev/null || exit 1
-  terraform init > /dev/null
+  terraform init 2>&1
   RAW_INPUT="$( terraform show "tfplan" 2>&1 )"
   SHOW_RESULT=$?
   if [ $SHOW_RESULT -ne 0 ]; then
