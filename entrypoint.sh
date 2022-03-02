@@ -58,9 +58,12 @@ COMMAND=$1
 RAW_INPUT="$COMMENTER_INPUT"
 if test -f "/workspace/tfplan"; then
   info "Found tfplan; showing."
-  pushd "/workspace" > /dev/null
+  cd workspace || exit 1
   RAW_INPUT="$( terraform show "tfplan" 2>&1 )"
-  popd > /dev/null
+  SHOW_RESULT=$?
+  if [ $SHOW_RESULT -ne 0 ]; then
+     info "Plan failed to show.  Plan output: \n$RAW_INPUT"
+  fi
   debug "Plan raw input: $RAW_INPUT"
 else
   info "Found no tfplan.  Proceeding with input argument."
