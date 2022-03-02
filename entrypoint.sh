@@ -254,7 +254,10 @@ if [[ $COMMAND == 'plan' ]]; then
       debug "Remaining plan: \n$REMAINING_PLAN"
 
       CURRENT_PLAN=${REMAINING_PLAN::65300} # GitHub has a 65535-char comment limit - truncate and iterate
-      CURRENT_PLAN="${CURRENT_PLAN%$'\n'*}" # trim to the last newline
+      if [ ${#CURRENT_PLAN} -ne ${#REMAINING_PLAN} ] ; then
+        debug "Plan is over 64k length limit.  Splitting."
+        CURRENT_PLAN="${CURRENT_PLAN%$'\n'*}" # trim to the last newline
+      fi
       PROCESSED_PLAN_LENGTH=$((PROCESSED_PLAN_LENGTH+${#CURRENT_PLAN})) # evaluate length of outbound comment and store
 
       debug "Processed plan length: ${PROCESSED_PLAN_LENGTH}"
