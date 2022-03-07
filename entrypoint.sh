@@ -85,7 +85,7 @@ fi
 # iff not preceded by a literal "/" as in "+/-".
 # this serves as an intermediate representation representing "diff removal line" as distinct from
 # a raw hyphen which could *also* indicate a yaml list entry.
-INPUT=$(echo "$RAW_INPUT" | sed "s/(?<!\/)\x1b\[31m-\x1b\[0m/😅/g")
+INPUT=$(echo "$RAW_INPUT" | perl -pe "s/(?<!\/)\e\[31m-\e\[0m/😅/g")
 
 # now remove all ANSI colors
 INPUT=$(echo "$INPUT" | sed 's/\x1b\[[0-9;]*m//g')
