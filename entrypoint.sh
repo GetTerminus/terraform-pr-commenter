@@ -53,6 +53,116 @@ make_and_post_payload () {
   curl -sS -X POST -H "$AUTH_HEADER" -H "$ACCEPT_HEADER" -H "$CONTENT_HEADER" -d "$PR_PAYLOAD" -L "$PR_COMMENTS_URL" > /dev/null
 }
 
+# usage:  split_plan target_array_name plan_text
+split_plan () {
+  local -n split=$1
+  local remaining_plan=$2
+  local processed_plan_length=0
+  split=()
+  # trim to the last newline that fits within length
+  while [ ${#remaining_plan} -gt 0 ] ; do
+    debug "Remaining plan: \n${remaining_plan}"
+
+    local current_plan=${remaining_plan::65300} # GitHub has a 65535-char comment limit - truncate and iterate
+    if [ ${#current_plan} -ne ${#remaining_plan} ] ; then
+      debug "Plan is over 64k length limit.  Splitting."
+      current_plan="${current_plan%$'\n'*}" # trim to the last newline
+    fi
+    processed_plan_length=$((processed_plan_length+${#current_plan})) # evaluate length of outbound comment and store
+
+    debug "Processed plan length: ${processed_plan_length}"
+    split+=("$current_plan")
+    remaining_plan=${remaining_plan:processed_plan_length}
+  done
+}
+
+substitute_and_colorize () {
+  local current_plan=$1
+    current_plan=$(echo "$current_plan" | sed -r 's/^([[:blank:]]*)([😅+~])/\2\1/g' | sed -r 's/^😅/-/')
+  if [[ $COLOURISE == 'true' ]]; then
+    current_plan=$(echo "$current_plan" | sed -r 's/^~/!/g') # Replace ~ with ! to colourise the diff in GitHub comments
+  fi
+  echo "$current_plan"
+}
+
+delete_existing_comments () {
+  # Look for an existing PR comment and delete
+  echo -e "TEST:  PRS $(curl -sS -H "$AUTH_HEADER" -H "$ACCEPT_HEADER" -L $PR_COMMENTS_URL)"
+
+  local type=$1
+  local regex=$2
+
+  local jq='.[] | select(.body|test ("'
+  jq+=$regex
+  jq+='")) | .id'
+  echo -e "\033[34;1mINFO:\033[0m Looking for an existing $type PR comment."
+  for PR_COMMENT_ID in $(curl -sS -H "$AUTH_HEADER" -H "$ACCEPT_HEADER" -L $PR_COMMENTS_URL | jq "$jq")
+  do
+    FOUND=true
+    echo -e "\033[34;1mINFO:\033[0m Found existing $type PR comment: $PR_COMMENT_ID. Deleting."
+    PR_COMMENT_URL="$PR_COMMENT_URI/$PR_COMMENT_ID"
+    # TODO comment back in
+    # curl -sS -X DELETE -H "$AUTH_HEADER" -H "$ACCEPT_HEADER" -L "$PR_COMMENT_URL" > /dev/null
+  done
+  if [ -z $FOUND ]; then
+    echo -e "\033[34;1mINFO:\033[0m No existing $type PR comment found."
+  fi
+}
+
+plan_success () {
+  local clean_plan=$(echo "$INPUT" | perl -pe'$_="" unless /(An execution plan has been generated and is shown below.|Terraform used the selected providers to generate the following execution|No changes. Infrastructure is up-to-date.|No changes. Your infrastructure matches the configuration.)/ .. 1') # Strip refresh section
+  clean_plan=$(echo "$clean_plan" | sed -r '/Plan: /q') # Ignore everything after plan summary
+
+  debug "Total plan length: ${#clean_plan}"
+  local plan_split
+  split_plan plan_split "$clean_plan"
+
+  echo "Writing ${#plan_split[@]} plan comment(s)"
+
+  for plan in "${plan_split[@]}"; do
+    local colorized_plan=$(substitute_and_colorize "$plan")
+    local comment="### Terraform \`plan\` Succeeded for Workspace: \`$WORKSPACE\`
+<details$DETAILS_STATE><summary>Show Output</summary>
+
+\`\`\`diff
+$colorized_plan
+\`\`\`
+</details>"
+    make_and_post_payload "$comment"
+  done
+}
+
+plan_fail () {
+  local comment="### Terraform \`plan\` Failed for Workspace: \`$WORKSPACE\`
+<details$DETAILS_STATE><summary>Show Output</summary>
+
+\`\`\`
+$INPUT
+\`\`\`
+</details>"
+
+  # Add plan comment to PR.
+  make_and_post_payload "$(echo '{}' | jq --arg body "$comment" '.body = $body')"
+}
+
+execute_plan () {
+  delete_existing_comments 'plan' '### Terraform `plan` .* for Workspace: `'$WORKSPACE'`'
+
+  # Exit Code: 0, 2
+  # Meaning: 0 = Terraform plan succeeded with no changes. 2 = Terraform plan succeeded with changes.
+  # Actions: Strip out the refresh section, ignore everything after the 72 dashes, format, colourise and build PR comment.
+  if [[ $EXIT_CODE -eq 0 || $EXIT_CODE -eq 2 ]]; then
+    plan_success
+  fi
+
+    # Exit Code: 1
+  # Meaning: Terraform plan failed.
+  # Actions: Build PR comment.
+  if [[ $EXIT_CODE -eq 1 ]]; then
+    plan_fail
+  fi
+}
+
 ##################
 # Shared Variables
 ##################
@@ -228,74 +338,7 @@ fi
 # Handler: plan
 ###############
 if [[ $COMMAND == 'plan' ]]; then
-  # Look for an existing plan PR comment and delete
-  info "Looking for an existing plan PR comment."
-  for PR_COMMENT_ID in $(curl -sS -H "$AUTH_HEADER" -H "$ACCEPT_HEADER" -L "$PR_COMMENTS_URL" | jq '.[] | select(.body|test ("### Terraform `plan` .* for Workspace: `'$WORKSPACE'`")) | .id')
-  do
-    FOUND=true
-    info "Found existing plan PR comment: $PR_COMMENT_ID. Deleting."
-    PR_COMMENT_URL="$PR_COMMENT_URI/$PR_COMMENT_ID"
-    curl -sS -X DELETE -H "$AUTH_HEADER" -H "$ACCEPT_HEADER" -L "$PR_COMMENT_URL" > /dev/null
-  done
-  if [ -z $FOUND ]; then
-    info "No existing plan PR comment found."
-  fi
-
-  # Exit Code: 0, 2
-  # Meaning: 0 = Terraform plan succeeded with no changes. 2 = Terraform plan succeeded with changes.
-  # Actions: Strip out the refresh section, ignore everything after the 72 dashes, format, colourise and build PR comment.
-  if [[ $EXIT_CODE -eq 0 || $EXIT_CODE -eq 2 ]]; then
-    CLEAN_PLAN=$(echo "$INPUT" | perl -pe'$_="" unless /(An execution plan has been generated and is shown below.|Terraform used the selected providers to generate the following execution|No changes. Infrastructure is up-to-date.|No changes. Your infrastructure matches the configuration.)/ .. 1') # Strip refresh section
-    CLEAN_PLAN=$(echo "$CLEAN_PLAN" | sed -r '/Plan: /q') # Ignore everything after plan summary
-    REMAINING_PLAN=$CLEAN_PLAN
-    PROCESSED_PLAN_LENGTH=0
-
-    # trim to the last newline that fits within length
-    while [ ${#REMAINING_PLAN} -gt 0 ] ; do
-      debug "Remaining plan: \n$REMAINING_PLAN"
-
-      CURRENT_PLAN=${REMAINING_PLAN::65300} # GitHub has a 65535-char comment limit - truncate and iterate
-      if [ ${#CURRENT_PLAN} -ne ${#REMAINING_PLAN} ] ; then
-        debug "Plan is over 64k length limit.  Splitting."
-        CURRENT_PLAN="${CURRENT_PLAN%$'\n'*}" # trim to the last newline
-      fi
-      PROCESSED_PLAN_LENGTH=$((PROCESSED_PLAN_LENGTH+${#CURRENT_PLAN})) # evaluate length of outbound comment and store
-
-      debug "Processed plan length: ${PROCESSED_PLAN_LENGTH}"
-
-      # Move any diff characters to start of line and then swap our emoji back to a '-'
-      CURRENT_PLAN=$(echo "$CURRENT_PLAN" | sed -r 's/^([[:blank:]]*)([😅+~])/\2\1/g' | sed -r 's/^😅/-/')
-      if [[ $COLOURISE == 'true' ]]; then
-        CURRENT_PLAN=$(echo "$CURRENT_PLAN" | sed -r 's/^~/!/g') # Replace ~ with ! to colourise the diff in GitHub comments
-      fi
-      PR_COMMENT="### Terraform \`plan\` Succeeded for Workspace: \`$WORKSPACE\`
-<details$DETAILS_STATE><summary>Show Output</summary>
-
-\`\`\`diff
-$CURRENT_PLAN
-\`\`\`
-</details>"
-
-      make_and_post_payload "$PR_COMMENT"
-      REMAINING_PLAN=${REMAINING_PLAN:PROCESSED_PLAN_LENGTH}
-    done
-  fi
-  # Exit Code: 1
-  # Meaning: Terraform plan failed.
-  # Actions: Build PR comment.
-  if [[ $EXIT_CODE -eq 1 ]]; then
-    PR_COMMENT="### Terraform \`plan\` Failed for Workspace: \`$WORKSPACE\`
-<details$DETAILS_STATE><summary>Show Output</summary>
-
-\`\`\`
-$INPUT
-\`\`\`
-</details>"
-
-    # Add plan comment to PR.
-    make_and_post_payload "$(echo '{}' | jq --arg body "$PR_COMMENT" '.body = $body')"
-  fi
-
+  execute_plan
   exit 0
 fi
 
