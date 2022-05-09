@@ -263,16 +263,17 @@ PR_COMMENT_URI=$(echo "$GITHUB_EVENT" | jq -r ".repository.issue_comment_url" | 
 # Handler: fmt
 ##############
 if [[ $COMMAND == 'fmt' ]]; then
+  delete_existing_comments 'fmt' '### Terraform `fmt` Failed'
   # Look for an existing fmt PR comment and delete
-  info "Looking for an existing fmt PR comment."
-  PR_COMMENT_ID=$(curl -sS -H "$AUTH_HEADER" -H "$ACCEPT_HEADER" -L "$PR_COMMENTS_URL" | jq '.[] | select(.body|test ("### Terraform `fmt` Failed")) | .id')
-  if [ "$PR_COMMENT_ID" ]; then
-    info "Found existing fmt PR comment: $PR_COMMENT_ID. Deleting."
-    PR_COMMENT_URL="$PR_COMMENT_URI/$PR_COMMENT_ID"
-    curl -sS -X DELETE -H "$AUTH_HEADER" -H "$ACCEPT_HEADER" -L "$PR_COMMENT_URL" > /dev/null
-  else
-    info "No existing fmt PR comment found."
-  fi
+#  info "Looking for an existing fmt PR comment."
+#  PR_COMMENT_ID=$(curl -sS -H "$AUTH_HEADER" -H "$ACCEPT_HEADER" -L "$PR_COMMENTS_URL" | jq '.[] | select(.body|test ("### Terraform `fmt` Failed")) | .id')
+#  if [ "$PR_COMMENT_ID" ]; then
+#    info "Found existing fmt PR comment: $PR_COMMENT_ID. Deleting."
+#    PR_COMMENT_URL="$PR_COMMENT_URI/$PR_COMMENT_ID"
+#    curl -sS -X DELETE -H "$AUTH_HEADER" -H "$ACCEPT_HEADER" -L "$PR_COMMENT_URL" > /dev/null
+#  else
+#    info "No existing fmt PR comment found."
+#  fi
 
   # Exit Code: 0
   # Meaning: All files formatted correctly.
@@ -328,16 +329,17 @@ fi
 # Handler: init
 ###############
 if [[ $COMMAND == 'init' ]]; then
-  # Look for an existing init PR comment and delete
-  info "Looking for an existing init PR comment."
-  PR_COMMENT_ID=$(curl -sS -H "$AUTH_HEADER" -H "$ACCEPT_HEADER" -L "$PR_COMMENTS_URL" | jq '.[] | select(.body|test ("### Terraform `init` Failed")) | .id')
-  if [ "$PR_COMMENT_ID" ]; then
-    info "Found existing init PR comment: $PR_COMMENT_ID. Deleting."
-    PR_COMMENT_URL="$PR_COMMENT_URI/$PR_COMMENT_ID"
-    curl -sS -X DELETE -H "$AUTH_HEADER" -H "$ACCEPT_HEADER" -L "$PR_COMMENT_URL" > /dev/null
-  else
-    info "No existing init PR comment found."
-  fi
+  delete_existing_comments "init" '### Terraform `init` Failed'
+#  # Look for an existing init PR comment and delete
+#  info "Looking for an existing init PR comment."
+#  PR_COMMENT_ID=$(curl -sS -H "$AUTH_HEADER" -H "$ACCEPT_HEADER" -L "$PR_COMMENTS_URL" | jq '.[] | select(.body|test ("### Terraform `init` Failed")) | .id')
+#  if [ "$PR_COMMENT_ID" ]; then
+#    info "Found existing init PR comment: $PR_COMMENT_ID. Deleting."
+#    PR_COMMENT_URL="$PR_COMMENT_URI/$PR_COMMENT_ID"
+#    curl -sS -X DELETE -H "$AUTH_HEADER" -H "$ACCEPT_HEADER" -L "$PR_COMMENT_URL" > /dev/null
+#  else
+#    info "No existing init PR comment found."
+#  fi
 
   # Exit Code: 0
   # Meaning: Terraform successfully initialized.
@@ -381,16 +383,17 @@ fi
 # Handler: validate
 ###################
 if [[ $COMMAND == 'validate' ]]; then
-  # Look for an existing validate PR comment and delete
-  info "Looking for an existing validate PR comment."
-  PR_COMMENT_ID=$(curl -sS -H "$AUTH_HEADER" -H "$ACCEPT_HEADER" -L "$PR_COMMENTS_URL" | jq '.[] | select(.body|test ("### Terraform `validate` Failed")) | .id')
-  if [ "$PR_COMMENT_ID" ]; then
-    info "Found existing validate PR comment: $PR_COMMENT_ID. Deleting."
-    PR_COMMENT_URL="$PR_COMMENT_URI/$PR_COMMENT_ID"
-    curl -sS -X DELETE -H "$AUTH_HEADER" -H "$ACCEPT_HEADER" -L "$PR_COMMENT_URL" > /dev/null
-  else
-    info "No existing validate PR comment found."
-  fi
+  delete_existing_comments "validate" '### Terraform `validate` Failed'
+#  # Look for an existing validate PR comment and delete
+#  info "Looking for an existing validate PR comment."
+#  PR_COMMENT_ID=$(curl -sS -H "$AUTH_HEADER" -H "$ACCEPT_HEADER" -L "$PR_COMMENTS_URL" | jq '.[] | select(.body|test ("### Terraform `validate` Failed")) | .id')
+#  if [ "$PR_COMMENT_ID" ]; then
+#    info "Found existing validate PR comment: $PR_COMMENT_ID. Deleting."
+#    PR_COMMENT_URL="$PR_COMMENT_URI/$PR_COMMENT_ID"
+#    curl -sS -X DELETE -H "$AUTH_HEADER" -H "$ACCEPT_HEADER" -L "$PR_COMMENT_URL" > /dev/null
+#  else
+#    info "No existing validate PR comment found."
+#  fi
 
   # Exit Code: 0
   # Meaning: Terraform successfully validated.
