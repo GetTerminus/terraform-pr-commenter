@@ -88,7 +88,7 @@ substitute_and_colorize () {
 
 delete_existing_comments () {
   # Look for an existing PR comment and delete
-  echo -e "TEST:  PRS $(curl -sS -H "$AUTH_HEADER" -H "$ACCEPT_HEADER" -L $PR_COMMENTS_URL)"
+  # debug "Existing comments:  $(curl -sS -H "$AUTH_HEADER" -H "$ACCEPT_HEADER" -L $PR_COMMENTS_URL)"
 
   local type=$1
   local regex=$2
@@ -96,16 +96,16 @@ delete_existing_comments () {
   local jq='.[] | select(.body|test ("'
   jq+=$regex
   jq+='")) | .id'
-  echo -e "\033[34;1mINFO:\033[0m Looking for an existing $type PR comment."
+  info "Looking for an existing $type PR comment."
   for PR_COMMENT_ID in $(curl -sS -H "$AUTH_HEADER" -H "$ACCEPT_HEADER" -L $PR_COMMENTS_URL | jq "$jq")
   do
     FOUND=true
-    echo -e "\033[34;1mINFO:\033[0m Found existing $type PR comment: $PR_COMMENT_ID. Deleting."
+    info "Found existing $type PR comment: $PR_COMMENT_ID. Deleting."
     PR_COMMENT_URL="$PR_COMMENT_URI/$PR_COMMENT_ID"
     curl -sS -X DELETE -H "$AUTH_HEADER" -H "$ACCEPT_HEADER" -L "$PR_COMMENT_URL" > /dev/null
   done
   if [ -z $FOUND ]; then
-    echo -e "\033[34;1mINFO:\033[0m No existing $type PR comment found."
+    info "No existing $type PR comment found."
   fi
 }
 
@@ -117,7 +117,7 @@ plan_success () {
   local plan_split
   split_plan plan_split "$clean_plan"
 
-  echo "Writing ${#plan_split[@]} plan comment(s)"
+  info "Writing ${#plan_split[@]} plan comment(s)"
 
   for plan in "${plan_split[@]}"; do
     local colorized_plan=$(substitute_and_colorize "$plan")

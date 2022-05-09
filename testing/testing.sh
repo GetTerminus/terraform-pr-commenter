@@ -2351,8 +2351,8 @@ ACCEPT_HEADER="Accept: application/vnd.github.v3+json"
 AUTH_HEADER="Authorization: token $GH_TOKEN"
 CONTENT_HEADER="Content-Type: application/json"
 
-PR_COMMENTS_URL="https://api.github.com/repos/GetTerminus/creative_asset_library_infra/issues/270/comments"
-PR_COMMENT_URI="https://api.github.com/repos/GetTerminus/creative_asset_library_infra/issues/comments/270"
+PR_COMMENTS_URL="https://api.github.com/repos/GetTerminus/web-event-capture-infra/issues/122/comments"
+PR_COMMENT_URI="https://api.github.com/repos/GetTerminus/web-event-capture-infra/issues/comments/122"
 
 WORKSPACE=ninja
 
