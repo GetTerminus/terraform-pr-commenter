@@ -241,7 +241,7 @@ execute_plan () {
     plan_success
   fi
 
-    # Exit Code: 1
+  # Exit Code: 1
   # Meaning: Terraform plan failed.
   # Actions: Build PR comment.
   if [[ $EXIT_CODE -eq 1 ]]; then

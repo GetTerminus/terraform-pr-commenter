@@ -35,7 +35,7 @@ runs:
         GITHUB_EVENT: ${{ toJSON(github.event) }}
         AWS_SECRET_ACCESS_KEY: ${{ env.AWS_SECRET_KEY }}
       run: |
-        COMMENTER_INPUT=${COMMENTER_INPUT:65000}
+        COMMENTER_INPUT=${COMMENTER_INPUT::65000}
         docker run \
         -e GITHUB_TOKEN \
         -e TF_WORKSPACE \
