@@ -7,7 +7,7 @@ fi
 make_and_post_payload () {
   # Add plan comment to PR.
   PR_PAYLOAD=$(echo '{}' | jq --arg body "$1" '.body = $body')
-  echo -e "\033[34;1mINFO:\033[0m Adding plan comment to PR."
+  info "Adding comment to PR."
   debug "PR payload:\n$PR_PAYLOAD"
   # curl -sS -X POST -H "$AUTH_HEADER" -H "$ACCEPT_HEADER" -H "$CONTENT_HEADER" -d "$1" -L "$PR_COMMENTS_URL" > /dev/null
 }
@@ -26,32 +26,31 @@ error () {
   echo -e "\033[31;1mERROR:\033[0m $1"
 }
 
-# usage:  split_plan target_array_name plan_text
-split_plan () {
+# usage:  split_string target_array_name plan_text
+split_string () {
   local -n split=$1
-  local total_plan=$2
-  local remaining_plan=$total_plan
-  local processed_plan_length=0
+  local entire_string=$2
+  local remaining_string=$entire_string
+  local processed_length=0
   split=()
 
-  debug "Total plan length to split: ${#remaining_plan}"
+  debug "Total length to split: ${#remaining_string}"
   # trim to the last newline that fits within length
-  while [ ${#remaining_plan} -gt 0 ] ; do
-    debug "Remaining plan: \n${remaining_plan}"
+  while [ ${#remaining_string} -gt 0 ] ; do
+    debug "Remaining input: \n${remaining_string}"
 
-    local current_plan=${remaining_plan::65300} # GitHub has a 65535-char comment limit - truncate and iterate
-    if [ ${#current_plan} -ne ${#remaining_plan} ] ; then
-      debug "Plan is over 64k length limit.  Splitting at index ${#current_plan} of ${#remaining_plan}."
-      current_plan="${current_plan%$'\n'*}" # trim to the last newline
-      debug "Trimmed split string to index ${#current_plan}"
+    local current_iteration=${remaining_string::65300} # GitHub has a 65535-char comment limit - truncate and iterate
+    if [ ${#current_iteration} -ne ${#remaining_string} ] ; then
+      debug "String is over 64k length limit.  Splitting at index ${#current_iteration} of ${#remaining_string}."
+      current_iteration="${current_iteration%$'\n'*}" # trim to the last newline
+      debug "Trimmed split string to index ${#current_iteration}"
     fi
-    processed_plan_length=$((processed_plan_length+${#current_plan})) # evaluate length of outbound comment and store
+    processed_length=$((processed_length+${#current_iteration})) # evaluate length of outbound comment and store
 
-    debug "Processed plan length: ${processed_plan_length}"
-    split+=("$current_plan")
+    debug "Processed string length: ${processed_length}"
+    split+=("$current_iteration")
 
-    # bug:  we increment remaining plan before end of loop?
-    remaining_plan=${total_plan:processed_plan_length}
+    remaining_string=${entire_string:processed_length}
   done
 }
 
@@ -87,53 +86,48 @@ delete_existing_comments () {
   fi
 }
 
-post_plan_comments() {
-  local clean_plan=$(echo "$INPUT" | perl -pe'$_="" unless /(An execution plan has been generated and is shown below.|Terraform used the selected providers to generate the following execution|No changes. Infrastructure is up-to-date.|No changes. Your infrastructure matches the configuration.)/ .. 1') # Strip refresh section
-  clean_plan=$(echo "$clean_plan" | sed -r '/Plan: /q') # Ignore everything after plan summary
+post_comments () {
+  local type=$1
+  local comment_prefix=$2
+  local comment_string=$3
 
-  debug "Total plan length: ${#clean_plan}"
-  local plan_split
-  split_plan plan_split "$clean_plan"
-  local comment_count=${#plan_split[@]}
+  debug "Total $type length: ${#comment_string}"
+  local comment_split
+  split_string comment_split "$comment_string"
+  local comment_count=${#comment_split[@]}
 
-  info "Writing $comment_count plan comment(s)"
+  info "Writing $comment_count $type comment(s)"
 
-  for i in "${!plan_split[@]}"; do
-    local plan="${plan_split[$i]}"
-    local colorized_plan=$(substitute_and_colorize "$plan")
-    local comment="### Terraform \`plan\` Succeeded for Workspace: \`$WORKSPACE\` ($((i+1))/$comment_count)
+  for i in "${!comment_split[@]}"; do
+    local current="${comment_split[$i]}"
+    local colorized_comment=$(substitute_and_colorize "$current")
+    local comment_count_text=""
+    if [ "$comment_count" -ne 1 ]; then
+      comment_count_text=" ($((i+1))/$comment_count)"
+    fi
+    local comment="$comment_prefix$comment_count_text
 <details$DETAILS_STATE><summary>Show Output</summary>
 
 \`\`\`diff
-$colorized_plan
+$colorized_comment
 \`\`\`
 </details>"
     make_and_post_payload "$comment"
   done
 }
 
+post_plan_comments () {
+  local clean_plan=$(echo "$INPUT" | perl -pe'$_="" unless /(An execution plan has been generated and is shown below.|Terraform used the selected providers to generate the following execution|No changes. Infrastructure is up-to-date.|No changes. Your infrastructure matches the configuration.)/ .. 1') # Strip refresh section
+  clean_plan=$(echo "$clean_plan" | sed -r '/------------------------------------------------------------------------/q') # Ignore everything after plan summary
+
+  post_comments "plan" "### Terraform \`plan\` Succeeded for Workspace: \`$WORKSPACE\`" "$clean_plan"
+}
+
 post_outputs_comments() {
   local clean_plan=$(echo "$INPUT" | perl -pe'$_="" unless /Changes to Outputs:/ .. 1') # Skip to end of plan summary
+  clean_plan=$(echo "$clean_plan" | sed -r '/This plan was saved to: /q') # Ignore everything after plan summary
 
-  debug "Total outputs length: ${#clean_plan}"
-  local plan_split
-  split_plan plan_split "$clean_plan"
-  local comment_count=${#plan_split[@]}
-
-  info "Writing $comment_count outputs comment(s)"
-
-  for i in "${!plan_split[@]}"; do
-    local plan="${plan_split[$i]}"
-    local colorized_plan=$(substitute_and_colorize "$plan")
-    local comment="### Changes to outputs for Workspace: \`$WORKSPACE\` ($((i+1))/$comment_count)
-<details$DETAILS_STATE><summary>Show Output</summary>
-
-\`\`\`diff
-$colorized_plan
-\`\`\`
-</details>"
-    make_and_post_payload "$comment"
-  done
+  post_comments "outputs" "### Changes to outputs for Workspace: \`$WORKSPACE\`" "$clean_plan"
 }
 
 plan_success () {
