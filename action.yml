@@ -44,6 +44,7 @@ runs:
         -e AWS_REGION \
         -e COMMENTER_DEBUG \
         -e COMMENTER_ECHO \
+        -e COMMENTER_POST_PLAN_OUTPUTS \
         -v "$(pwd)"/:/workspace \
         commenter ${{ inputs.commenter_type }} nop ${{ inputs.commenter_exitcode }}
       shell: bash

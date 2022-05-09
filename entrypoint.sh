@@ -77,7 +77,6 @@ split_plan () {
     debug "Processed plan length: ${processed_plan_length}"
     split+=("$current_plan")
 
-    # bug:  we increment remaining plan before end of loop?
     remaining_plan=${total_plan:processed_plan_length}
   done
 }
@@ -114,7 +113,7 @@ delete_existing_comments () {
   fi
 }
 
-plan_success () {
+post_plan_comments() {
   local clean_plan=$(echo "$INPUT" | perl -pe'$_="" unless /(An execution plan has been generated and is shown below.|Terraform used the selected providers to generate the following execution|No changes. Infrastructure is up-to-date.|No changes. Your infrastructure matches the configuration.)/ .. 1') # Strip refresh section
   clean_plan=$(echo "$clean_plan" | sed -r '/Plan: /q') # Ignore everything after plan summary
 
@@ -137,6 +136,37 @@ $colorized_plan
 </details>"
     make_and_post_payload "$comment"
   done
+}
+
+post_outputs_comments() {
+  local clean_plan=$(echo "$INPUT" | perl -pe'$_="" unless /Changes to Outputs:/ .. 1') # Skip to end of plan summary
+
+  debug "Total outputs length: ${#clean_plan}"
+  local plan_split
+  split_plan plan_split "$clean_plan"
+  local comment_count=${#plan_split[@]}
+
+  info "Writing $comment_count outputs comment(s)"
+
+  for i in "${!plan_split[@]}"; do
+    local plan="${plan_split[$i]}"
+    local colorized_plan=$(substitute_and_colorize "$plan")
+    local comment="### Changes to outputs for Workspace: \`$WORKSPACE\` ($((i+1))/$comment_count)
+<details$DETAILS_STATE><summary>Show Output</summary>
+
+\`\`\`diff
+$colorized_plan
+\`\`\`
+</details>"
+    make_and_post_payload "$comment"
+  done
+}
+
+plan_success () {
+  post_plan_comments
+  if [[ $POST_PLAN_OUTPUTS == 'true' ]]; then
+    post_outputs_comments
+  fi
 }
 
 plan_fail () {
@@ -222,6 +252,9 @@ fi
 
 # Read HIGHLIGHT_CHANGES environment variable or use "true"
 COLOURISE=${HIGHLIGHT_CHANGES:-true}
+
+# Read COMMENTER_POST_PLAN_OUTPUTS environment variable or use "true"
+POST_PLAN_OUTPUTS=${COMMENTER_POST_PLAN_OUTPUTS:-true}
 
 ACCEPT_HEADER="Accept: application/vnd.github.v3+json"
 AUTH_HEADER="Authorization: token $GITHUB_TOKEN"

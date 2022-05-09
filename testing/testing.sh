@@ -18,26 +18,40 @@ debug () {
   fi
 }
 
+info () {
+  echo -e "\033[34;1mINFO:\033[0m $1"
+}
+
+error () {
+  echo -e "\033[31;1mERROR:\033[0m $1"
+}
+
 # usage:  split_plan target_array_name plan_text
 split_plan () {
   local -n split=$1
-  local remaining_plan=$2
+  local total_plan=$2
+  local remaining_plan=$total_plan
   local processed_plan_length=0
   split=()
+
+  debug "Total plan length to split: ${#remaining_plan}"
   # trim to the last newline that fits within length
   while [ ${#remaining_plan} -gt 0 ] ; do
     debug "Remaining plan: \n${remaining_plan}"
 
     local current_plan=${remaining_plan::65300} # GitHub has a 65535-char comment limit - truncate and iterate
     if [ ${#current_plan} -ne ${#remaining_plan} ] ; then
-      debug "Plan is over 64k length limit.  Splitting."
+      debug "Plan is over 64k length limit.  Splitting at index ${#current_plan} of ${#remaining_plan}."
       current_plan="${current_plan%$'\n'*}" # trim to the last newline
+      debug "Trimmed split string to index ${#current_plan}"
     fi
     processed_plan_length=$((processed_plan_length+${#current_plan})) # evaluate length of outbound comment and store
 
     debug "Processed plan length: ${processed_plan_length}"
     split+=("$current_plan")
-    remaining_plan=${remaining_plan:processed_plan_length}
+
+    # bug:  we increment remaining plan before end of loop?
+    remaining_plan=${total_plan:processed_plan_length}
   done
 }
 
@@ -73,21 +87,21 @@ delete_existing_comments () {
   fi
 }
 
-plan_success () {
-  # while working with a tmp (brief) plan, don't do this kind of trim.
-  #CLEAN_PLAN="$INPUT"
-#  CLEAN_PLAN=$(echo "$INPUT" | perl -pe's/^(An execution plan has been generated and is shown below.|Terraform used the selected providers to generate the following execution|No changes. Infrastructure is up-to-date.|No changes. Your infrastructure matches the configuration.)$/,$!d/') # Strip refresh section
-  CLEAN_PLAN=$(echo "$INPUT" | perl -pe'$_="" unless /(An execution plan has been generated and is shown below.|Terraform used the selected providers to generate the following execution|No changes. Infrastructure is up-to-date.|No changes. Your infrastructure matches the configuration.)/ .. 1') # Strip refresh section
-  #CLEAN_PLAN=$(echo "$CLEAN_PLAN" | sed -r '/Plan: /q') # Ignore everything after plan summary
+post_plan_comments() {
+  local clean_plan=$(echo "$INPUT" | perl -pe'$_="" unless /(An execution plan has been generated and is shown below.|Terraform used the selected providers to generate the following execution|No changes. Infrastructure is up-to-date.|No changes. Your infrastructure matches the configuration.)/ .. 1') # Strip refresh section
+  clean_plan=$(echo "$clean_plan" | sed -r '/Plan: /q') # Ignore everything after plan summary
 
-  debug "Total plan length: ${#CLEAN_PLAN}"
-  split_plan plan_split "$CLEAN_PLAN"
+  debug "Total plan length: ${#clean_plan}"
+  local plan_split
+  split_plan plan_split "$clean_plan"
+  local comment_count=${#plan_split[@]}
 
-  echo "Writing ${#plan_split[@]} plan comment(s)"
+  info "Writing $comment_count plan comment(s)"
 
-  for plan in "${plan_split[@]}"; do
+  for i in "${!plan_split[@]}"; do
+    local plan="${plan_split[$i]}"
     local colorized_plan=$(substitute_and_colorize "$plan")
-    local comment="### Terraform \`plan\` Succeeded for Workspace: \`$WORKSPACE\`
+    local comment="### Terraform \`plan\` Succeeded for Workspace: \`$WORKSPACE\` ($((i+1))/$comment_count)
 <details$DETAILS_STATE><summary>Show Output</summary>
 
 \`\`\`diff
@@ -96,6 +110,50 @@ $colorized_plan
 </details>"
     make_and_post_payload "$comment"
   done
+}
+
+post_outputs_comments() {
+  local clean_plan=$(echo "$INPUT" | perl -pe'$_="" unless /Changes to Outputs:/ .. 1') # Skip to end of plan summary
+
+  debug "Total outputs length: ${#clean_plan}"
+  local plan_split
+  split_plan plan_split "$clean_plan"
+  local comment_count=${#plan_split[@]}
+
+  info "Writing $comment_count outputs comment(s)"
+
+  for i in "${!plan_split[@]}"; do
+    local plan="${plan_split[$i]}"
+    local colorized_plan=$(substitute_and_colorize "$plan")
+    local comment="### Changes to outputs for Workspace: \`$WORKSPACE\` ($((i+1))/$comment_count)
+<details$DETAILS_STATE><summary>Show Output</summary>
+
+\`\`\`diff
+$colorized_plan
+\`\`\`
+</details>"
+    make_and_post_payload "$comment"
+  done
+}
+
+plan_success () {
+  post_plan_comments
+  if [[ $POST_PLAN_OUTPUTS == 'true' ]]; then
+    post_outputs_comments
+  fi
+}
+
+plan_fail () {
+  local comment="### Terraform \`plan\` Failed for Workspace: \`$WORKSPACE\`
+<details$DETAILS_STATE><summary>Show Output</summary>
+
+\`\`\`
+$INPUT
+\`\`\`
+</details>"
+
+  # Add plan comment to PR.
+  make_and_post_payload "$(echo '{}' | jq --arg body "$comment" '.body = $body')"
 }
 
 plan_fail () {
@@ -2355,6 +2413,7 @@ PR_COMMENTS_URL="https://api.github.com/repos/GetTerminus/web-event-capture-infr
 PR_COMMENT_URI="https://api.github.com/repos/GetTerminus/web-event-capture-infra/issues/comments/122"
 
 WORKSPACE=ninja
+POST_PLAN_OUTPUTS=true
 
 execute_plan
 
