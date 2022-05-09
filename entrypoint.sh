@@ -18,7 +18,7 @@ if [[ -z "$GITHUB_TOKEN" ]]; then
 	exit 1
 fi
 
-if [[ -z $3 ]]; then
+if [[ -z $2 ]]; then
     echo "There must be an exit code from a previous step."
     exit 1
 fi
@@ -53,7 +53,7 @@ parse_args () {
   COMMAND=$1
   # Arg 2 is input file. We strip ANSI colours.
   RAW_INPUT="$COMMENTER_INPUT"
-  if test -f "/workspace/tfplan"; then
+  if test -f "/workspace/${COMMENTER_PLAN_FILE}"; then
     info "Found tfplan; showing."
     pushd workspace > /dev/null || (error "Failed to push workspace dir" && exit 1)
     INIT_OUTPUT="$(terraform init 2>&1)"
@@ -62,7 +62,7 @@ parse_args () {
        error "Failed pre-plan init.  Init output: \n$INIT_OUTPUT"
        exit 1
     fi
-    RAW_INPUT="$( terraform show "tfplan" 2>&1 )"
+    RAW_INPUT="$( terraform show "${COMMENTER_PLAN_FILE}" 2>&1 )"
     SHOW_RESULT=$?
     if [ $SHOW_RESULT -ne 0 ]; then
        error "Plan failed to show.  Plan output: \n$RAW_INPUT"
@@ -84,7 +84,7 @@ parse_args () {
   INPUT=$(echo "$INPUT" | sed -r 's/\x1b\[[0-9;]*m//g')
 
   # Arg 3 is the Terraform CLI exit code
-  EXIT_CODE=$3
+  EXIT_CODE=$2
 
   # Read TF_WORKSPACE environment variable or use "default"
   WORKSPACE=${TF_WORKSPACE:-default}
