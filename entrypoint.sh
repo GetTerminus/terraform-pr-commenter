@@ -28,9 +28,9 @@ if [[ ! "$1" =~ ^(fmt|init|plan|validate)$ ]]; then
   exit 1
 fi
 
-#############
-# Functions #
-#############
+###########
+# Logging #
+###########
 debug () {
   if [ -n "${COMMENTER_DEBUG+x}" ]; then
     echo -e "\033[33;1mDEBUG:\033[0m $1"
@@ -45,6 +45,74 @@ error () {
   echo -e "\033[31;1mERROR:\033[0m $1"
 }
 
+##################
+# Shared Variables
+##################
+parse_args () {
+  # Arg 1 is command
+  COMMAND=$1
+  # Arg 2 is input file. We strip ANSI colours.
+  RAW_INPUT="$COMMENTER_INPUT"
+  if test -f "/workspace/tfplan"; then
+    info "Found tfplan; showing."
+    pushd workspace > /dev/null || (error "Failed to push workspace dir" && exit 1)
+    INIT_OUTPUT="$(terraform init 2>&1)"
+    INIT_RESULT=$?
+    if [ $INIT_RESULT -ne 0 ]; then
+       error "Failed pre-plan init.  Init output: \n$INIT_OUTPUT"
+       exit 1
+    fi
+    RAW_INPUT="$( terraform show "tfplan" 2>&1 )"
+    SHOW_RESULT=$?
+    if [ $SHOW_RESULT -ne 0 ]; then
+       error "Plan failed to show.  Plan output: \n$RAW_INPUT"
+       exit 1
+    fi
+    popd > /dev/null || (error "Failed to pop workspace dir" && exit 1)
+    debug "Plan raw input: $RAW_INPUT"
+  else
+    info "Found no tfplan.  Proceeding with input argument."
+  fi
+
+  # change diff character, a red '-', into a high unicode character \U1f605 (literally 😅)
+  # iff not preceded by a literal "/" as in "+/-".
+  # this serves as an intermediate representation representing "diff removal line" as distinct from
+  # a raw hyphen which could *also* indicate a yaml list entry.
+  INPUT=$(echo "$RAW_INPUT" | perl -pe "s/(?<!\/)\e\[31m-\e\[0m/😅/g")
+
+  # now remove all ANSI colors
+  INPUT=$(echo "$INPUT" | sed -r 's/\x1b\[[0-9;]*m//g')
+
+  # Arg 3 is the Terraform CLI exit code
+  EXIT_CODE=$3
+
+  # Read TF_WORKSPACE environment variable or use "default"
+  WORKSPACE=${TF_WORKSPACE:-default}
+
+  # Read EXPAND_SUMMARY_DETAILS environment variable or use "true"
+  if [[ ${EXPAND_SUMMARY_DETAILS:-true} == "true" ]]; then
+    DETAILS_STATE=" open"
+  else
+    DETAILS_STATE=""
+  fi
+
+  # Read HIGHLIGHT_CHANGES environment variable or use "true"
+  COLOURISE=${HIGHLIGHT_CHANGES:-true}
+
+  # Read COMMENTER_POST_PLAN_OUTPUTS environment variable or use "true"
+  POST_PLAN_OUTPUTS=${COMMENTER_POST_PLAN_OUTPUTS:-true}
+
+  ACCEPT_HEADER="Accept: application/vnd.github.v3+json"
+  AUTH_HEADER="Authorization: token $GITHUB_TOKEN"
+  CONTENT_HEADER="Content-Type: application/json"
+
+  PR_COMMENTS_URL=$(echo "$GITHUB_EVENT" | jq -r ".pull_request.comments_url")
+  PR_COMMENT_URI=$(echo "$GITHUB_EVENT" | jq -r ".repository.issue_comment_url" | sed "s|{/number}||g")
+}
+
+###########
+# Utility #
+###########
 make_and_post_payload () {
   # Add plan comment to PR.
   PR_PAYLOAD=$(echo '{}' | jq --arg body "$1" '.body = $body')
@@ -143,18 +211,25 @@ $colorized_comment
   done
 }
 
-post_plan_comments () {
-  local clean_plan=$(echo "$INPUT" | perl -pe'$_="" unless /(An execution plan has been generated and is shown below.|Terraform used the selected providers to generate the following execution|No changes. Infrastructure is up-to-date.|No changes. Your infrastructure matches the configuration.)/ .. 1') # Strip refresh section
-  clean_plan=$(echo "$clean_plan" | sed -r '/Plan: /q') # Ignore everything after plan summary
+###############
+# Handler: plan
+###############
+execute_plan () {
+  delete_existing_comments 'plan' '### Terraform `plan` .* for Workspace: `'$WORKSPACE'`.*'
 
-  post_comments "plan" "### Terraform \`plan\` Succeeded for Workspace: \`$WORKSPACE\`" "$clean_plan"
-}
+  # Exit Code: 0, 2
+  # Meaning: 0 = Terraform plan succeeded with no changes. 2 = Terraform plan succeeded with changes.
+  # Actions: Strip out the refresh section, ignore everything after the 72 dashes, format, colourise and build PR comment.
+  if [[ $EXIT_CODE -eq 0 || $EXIT_CODE -eq 2 ]]; then
+    plan_success
+  fi
 
-post_outputs_comments() {
-  local clean_plan=$(echo "$INPUT" | perl -pe'$_="" unless /Changes to Outputs:/ .. 1') # Skip to end of plan summary
-  clean_plan=$(echo "$clean_plan" | sed -r '/------------------------------------------------------------------------/q') # Ignore everything after plan summary
-
-  post_comments "outputs" "### Changes to outputs for Workspace: \`$WORKSPACE\`" "$clean_plan"
+    # Exit Code: 1
+  # Meaning: Terraform plan failed.
+  # Actions: Build PR comment.
+  if [[ $EXIT_CODE -eq 1 ]]; then
+    plan_fail
+  fi
 }
 
 plan_success () {
@@ -177,113 +252,46 @@ $INPUT
   make_and_post_payload "$(echo '{}' | jq --arg body "$comment" '.body = $body')"
 }
 
-execute_plan () {
-  delete_existing_comments 'plan' '### Terraform `plan` .* for Workspace: `'$WORKSPACE'`.*'
+post_plan_comments () {
+  local clean_plan=$(echo "$INPUT" | perl -pe'$_="" unless /(An execution plan has been generated and is shown below.|Terraform used the selected providers to generate the following execution|No changes. Infrastructure is up-to-date.|No changes. Your infrastructure matches the configuration.)/ .. 1') # Strip refresh section
+  clean_plan=$(echo "$clean_plan" | sed -r '/Plan: /q') # Ignore everything after plan summary
 
-  # Exit Code: 0, 2
-  # Meaning: 0 = Terraform plan succeeded with no changes. 2 = Terraform plan succeeded with changes.
-  # Actions: Strip out the refresh section, ignore everything after the 72 dashes, format, colourise and build PR comment.
-  if [[ $EXIT_CODE -eq 0 || $EXIT_CODE -eq 2 ]]; then
-    plan_success
-  fi
-
-    # Exit Code: 1
-  # Meaning: Terraform plan failed.
-  # Actions: Build PR comment.
-  if [[ $EXIT_CODE -eq 1 ]]; then
-    plan_fail
-  fi
+  post_comments "plan" "### Terraform \`plan\` Succeeded for Workspace: \`$WORKSPACE\`" "$clean_plan"
 }
 
-##################
-# Shared Variables
-##################
-# Arg 1 is command
-COMMAND=$1
-# Arg 2 is input file. We strip ANSI colours.
-RAW_INPUT="$COMMENTER_INPUT"
-if test -f "/workspace/tfplan"; then
-  info "Found tfplan; showing."
-  pushd workspace > /dev/null || (error "Failed to push workspace dir" && exit 1)
-  INIT_OUTPUT="$(terraform init 2>&1)"
-  INIT_RESULT=$?
-  if [ $INIT_RESULT -ne 0 ]; then
-     error "Failed pre-plan init.  Init output: \n$INIT_OUTPUT"
-     exit 1
-  fi
-  RAW_INPUT="$( terraform show "tfplan" 2>&1 )"
-  SHOW_RESULT=$?
-  if [ $SHOW_RESULT -ne 0 ]; then
-     error "Plan failed to show.  Plan output: \n$RAW_INPUT"
-     exit 1
-  fi
-  popd > /dev/null || (error "Failed to pop workspace dir" && exit 1)
-  debug "Plan raw input: $RAW_INPUT"
-else
-  info "Found no tfplan.  Proceeding with input argument."
-fi
+post_outputs_comments() {
+  local clean_plan=$(echo "$INPUT" | perl -pe'$_="" unless /Changes to Outputs:/ .. 1') # Skip to end of plan summary
+  clean_plan=$(echo "$clean_plan" | sed -r '/------------------------------------------------------------------------/q') # Ignore everything after plan summary
 
-# change diff character, a red '-', into a high unicode character \U1f605 (literally 😅)
-# iff not preceded by a literal "/" as in "+/-".
-# this serves as an intermediate representation representing "diff removal line" as distinct from
-# a raw hyphen which could *also* indicate a yaml list entry.
-INPUT=$(echo "$RAW_INPUT" | perl -pe "s/(?<!\/)\e\[31m-\e\[0m/😅/g")
-
-# now remove all ANSI colors
-INPUT=$(echo "$INPUT" | sed -r 's/\x1b\[[0-9;]*m//g')
-
-# Arg 3 is the Terraform CLI exit code
-EXIT_CODE=$3
-
-# Read TF_WORKSPACE environment variable or use "default"
-WORKSPACE=${TF_WORKSPACE:-default}
-
-# Read EXPAND_SUMMARY_DETAILS environment variable or use "true"
-if [[ ${EXPAND_SUMMARY_DETAILS:-true} == "true" ]]; then
-  DETAILS_STATE=" open"
-else
-  DETAILS_STATE=""
-fi
-
-# Read HIGHLIGHT_CHANGES environment variable or use "true"
-COLOURISE=${HIGHLIGHT_CHANGES:-true}
-
-# Read COMMENTER_POST_PLAN_OUTPUTS environment variable or use "true"
-POST_PLAN_OUTPUTS=${COMMENTER_POST_PLAN_OUTPUTS:-true}
-
-ACCEPT_HEADER="Accept: application/vnd.github.v3+json"
-AUTH_HEADER="Authorization: token $GITHUB_TOKEN"
-CONTENT_HEADER="Content-Type: application/json"
-
-PR_COMMENTS_URL=$(echo "$GITHUB_EVENT" | jq -r ".pull_request.comments_url")
-PR_COMMENT_URI=$(echo "$GITHUB_EVENT" | jq -r ".repository.issue_comment_url" | sed "s|{/number}||g")
-
+  post_comments "outputs" "### Changes to outputs for Workspace: \`$WORKSPACE\`" "$clean_plan"
+}
 
 ##############
 # Handler: fmt
 ##############
-if [[ $COMMAND == 'fmt' ]]; then
+execute_fmt () {
   delete_existing_comments 'fmt' '### Terraform `fmt` Failed'
-  # Look for an existing fmt PR comment and delete
-#  info "Looking for an existing fmt PR comment."
-#  PR_COMMENT_ID=$(curl -sS -H "$AUTH_HEADER" -H "$ACCEPT_HEADER" -L "$PR_COMMENTS_URL" | jq '.[] | select(.body|test ("### Terraform `fmt` Failed")) | .id')
-#  if [ "$PR_COMMENT_ID" ]; then
-#    info "Found existing fmt PR comment: $PR_COMMENT_ID. Deleting."
-#    PR_COMMENT_URL="$PR_COMMENT_URI/$PR_COMMENT_ID"
-#    curl -sS -X DELETE -H "$AUTH_HEADER" -H "$ACCEPT_HEADER" -L "$PR_COMMENT_URL" > /dev/null
-#  else
-#    info "No existing fmt PR comment found."
-#  fi
 
   # Exit Code: 0
   # Meaning: All files formatted correctly.
   # Actions: Exit.
   if [[ $EXIT_CODE -eq 0 ]]; then
-    info "Terraform fmt completed with no errors. Continuing."
-
-    exit 0
+    fmt_success
   fi
 
+  # Exit Code: 1, 2
+  # Meaning: 1 = Malformed Terraform CLI command. 2 = Terraform parse error.
+  # Actions: Build PR comment.
+  if [[ $EXIT_CODE -eq 1 || $EXIT_CODE -eq 2 || $EXIT_CODE -eq 3 ]]; then
+    fmt_fail
+  fi
+}
+
+fmt_success () {
+  info "Terraform fmt completed with no errors. Continuing."
+}
+
+fmt_fail () {
   # Exit Code: 1, 2
   # Meaning: 1 = Malformed Terraform CLI command. 2 = Terraform parse error.
   # Actions: Build PR comment.
@@ -321,106 +329,111 @@ $ALL_FILES_DIFF"
   PR_PAYLOAD=$(echo '{}' | jq --arg body "$PR_COMMENT" '.body = $body')
   info "Adding fmt failure comment to PR."
   curl -sS -X POST -H "$AUTH_HEADER" -H "$ACCEPT_HEADER" -H "$CONTENT_HEADER" -d "$PR_PAYLOAD" -L "$PR_COMMENTS_URL" > /dev/null
-
-  exit 0
-fi
+}
 
 ###############
 # Handler: init
 ###############
-if [[ $COMMAND == 'init' ]]; then
+execute_init () {
   delete_existing_comments "init" '### Terraform `init` Failed'
-#  # Look for an existing init PR comment and delete
-#  info "Looking for an existing init PR comment."
-#  PR_COMMENT_ID=$(curl -sS -H "$AUTH_HEADER" -H "$ACCEPT_HEADER" -L "$PR_COMMENTS_URL" | jq '.[] | select(.body|test ("### Terraform `init` Failed")) | .id')
-#  if [ "$PR_COMMENT_ID" ]; then
-#    info "Found existing init PR comment: $PR_COMMENT_ID. Deleting."
-#    PR_COMMENT_URL="$PR_COMMENT_URI/$PR_COMMENT_ID"
-#    curl -sS -X DELETE -H "$AUTH_HEADER" -H "$ACCEPT_HEADER" -L "$PR_COMMENT_URL" > /dev/null
-#  else
-#    info "No existing init PR comment found."
-#  fi
 
   # Exit Code: 0
   # Meaning: Terraform successfully initialized.
   # Actions: Exit.
   if [[ $EXIT_CODE -eq 0 ]]; then
-    info "Terraform init completed with no errors. Continuing."
-
-    exit 0
+    init_success
   fi
 
   # Exit Code: 1
   # Meaning: Terraform initialize failed or malformed Terraform CLI command.
   # Actions: Build PR comment.
   if [[ $EXIT_CODE -eq 1 ]]; then
-    PR_COMMENT="### Terraform \`init\` Failed
+    init_fail
+  fi
+}
+
+init_success () {
+  info "Terraform init completed with no errors. Continuing."
+}
+
+init_fail () {
+  PR_COMMENT="### Terraform \`init\` Failed
 <details$DETAILS_STATE><summary>Show Output</summary>
 
 \`\`\`
 $INPUT
 \`\`\`
 </details>"
-  fi
 
   # Add init failure comment to PR.
   PR_PAYLOAD=$(echo '{}' | jq --arg body "$PR_COMMENT" '.body = $body')
   info "Adding init failure comment to PR."
   curl -sS -X POST -H "$AUTH_HEADER" -H "$ACCEPT_HEADER" -H "$CONTENT_HEADER" -d "$PR_PAYLOAD" -L "$PR_COMMENTS_URL" > /dev/null
-
-  exit 0
-fi
-
-###############
-# Handler: plan
-###############
-if [[ $COMMAND == 'plan' ]]; then
-  execute_plan
-  exit 0
-fi
+}
 
 ###################
 # Handler: validate
 ###################
-if [[ $COMMAND == 'validate' ]]; then
+execute_validate () {
   delete_existing_comments "validate" '### Terraform `validate` Failed'
-#  # Look for an existing validate PR comment and delete
-#  info "Looking for an existing validate PR comment."
-#  PR_COMMENT_ID=$(curl -sS -H "$AUTH_HEADER" -H "$ACCEPT_HEADER" -L "$PR_COMMENTS_URL" | jq '.[] | select(.body|test ("### Terraform `validate` Failed")) | .id')
-#  if [ "$PR_COMMENT_ID" ]; then
-#    info "Found existing validate PR comment: $PR_COMMENT_ID. Deleting."
-#    PR_COMMENT_URL="$PR_COMMENT_URI/$PR_COMMENT_ID"
-#    curl -sS -X DELETE -H "$AUTH_HEADER" -H "$ACCEPT_HEADER" -L "$PR_COMMENT_URL" > /dev/null
-#  else
-#    info "No existing validate PR comment found."
-#  fi
 
   # Exit Code: 0
   # Meaning: Terraform successfully validated.
   # Actions: Exit.
   if [[ $EXIT_CODE -eq 0 ]]; then
-    info "Terraform validate completed with no errors. Continuing."
-
-    exit 0
+    validate_success
   fi
 
   # Exit Code: 1
   # Meaning: Terraform validate failed or malformed Terraform CLI command.
   # Actions: Build PR comment.
   if [[ $EXIT_CODE -eq 1 ]]; then
-    PR_COMMENT="### Terraform \`validate\` Failed
+    validate_fail
+  fi
+}
+
+validate_success () {
+  info "Terraform validate completed with no errors. Continuing."
+}
+
+validate_fail () {
+  PR_COMMENT="### Terraform \`validate\` Failed
 <details$DETAILS_STATE><summary>Show Output</summary>
 
 \`\`\`
 $INPUT
 \`\`\`
 </details>"
-  fi
 
   # Add validate failure comment to PR.
   PR_PAYLOAD=$(echo '{}' | jq --arg body "$PR_COMMENT" '.body = $body')
   info "Adding validate failure comment to PR."
   curl -sS -X POST -H "$AUTH_HEADER" -H "$ACCEPT_HEADER" -H "$CONTENT_HEADER" -d "$PR_PAYLOAD" -L "$PR_COMMENTS_URL" > /dev/null
 
+  exit 0
+}
+
+###################
+# Procedural body #
+###################
+parse_args "$@"
+
+if [[ $COMMAND == 'fmt' ]]; then
+  execute_fmt
+  exit 0
+fi
+
+if [[ $COMMAND == 'init' ]]; then
+  execute_init
+  exit 0
+fi
+
+if [[ $COMMAND == 'plan' ]]; then
+  execute_plan
+  exit 0
+fi
+
+if [[ $COMMAND == 'validate' ]]; then
+  execute_validate
   exit 0
 fi
