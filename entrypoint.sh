@@ -128,7 +128,7 @@ plan_success () {
   for i in "${!plan_split[@]}"; do
     local plan="${plan_split[$i]}"
     local colorized_plan=$(substitute_and_colorize "$plan")
-    local comment="### Terraform \`plan\` Succeeded for Workspace: \`$WORKSPACE\` ($i/$comment_count)
+    local comment="### Terraform \`plan\` Succeeded for Workspace: \`$WORKSPACE\` ($((i+1))/$comment_count)
 <details$DETAILS_STATE><summary>Show Output</summary>
 
 \`\`\`diff
