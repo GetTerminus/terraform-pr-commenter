@@ -145,14 +145,14 @@ $colorized_comment
 
 post_plan_comments () {
   local clean_plan=$(echo "$INPUT" | perl -pe'$_="" unless /(An execution plan has been generated and is shown below.|Terraform used the selected providers to generate the following execution|No changes. Infrastructure is up-to-date.|No changes. Your infrastructure matches the configuration.)/ .. 1') # Strip refresh section
-  clean_plan=$(echo "$clean_plan" | sed -r '/------------------------------------------------------------------------/q') # Ignore everything after plan summary
+  clean_plan=$(echo "$clean_plan" | sed -r '/Plan: /q') # Ignore everything after plan summary
 
   post_comments "plan" "### Terraform \`plan\` Succeeded for Workspace: \`$WORKSPACE\`" "$clean_plan"
 }
 
 post_outputs_comments() {
   local clean_plan=$(echo "$INPUT" | perl -pe'$_="" unless /Changes to Outputs:/ .. 1') # Skip to end of plan summary
-  clean_plan=$(echo "$clean_plan" | sed -r '/This plan was saved to: /q') # Ignore everything after plan summary
+  clean_plan=$(echo "$clean_plan" | sed -r '/------------------------------------------------------------------------/q') # Ignore everything after plan summary
 
   post_comments "outputs" "### Changes to outputs for Workspace: \`$WORKSPACE\`" "$clean_plan"
 }
