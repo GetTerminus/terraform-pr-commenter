@@ -59,6 +59,8 @@ split_plan () {
   local remaining_plan=$2
   local processed_plan_length=0
   split=()
+
+  debug "Total plan length to splot: ${#remaining_plan}"
   # trim to the last newline that fits within length
   while [ ${#remaining_plan} -gt 0 ] ; do
     debug "Remaining plan: \n${remaining_plan}"
@@ -73,6 +75,8 @@ split_plan () {
 
     debug "Processed plan length: ${processed_plan_length}"
     split+=("$current_plan")
+
+    # bug:  we increment remaining plan before end of loop?
     remaining_plan=${remaining_plan:processed_plan_length}
   done
 }
