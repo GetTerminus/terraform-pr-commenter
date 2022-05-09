@@ -65,8 +65,9 @@ split_plan () {
 
     local current_plan=${remaining_plan::65300} # GitHub has a 65535-char comment limit - truncate and iterate
     if [ ${#current_plan} -ne ${#remaining_plan} ] ; then
-      debug "Plan is over 64k length limit.  Splitting."
+      debug "Plan is over 64k length limit.  Splitting at index ${#current_plan} of ${#remaining_plan}."
       current_plan="${current_plan%$'\n'*}" # trim to the last newline
+      debug "Trimmed split string to index ${#current_plan}"
     fi
     processed_plan_length=$((processed_plan_length+${#current_plan})) # evaluate length of outbound comment and store
 
