@@ -257,7 +257,7 @@ plan_success () {
 }
 
 plan_fail () {
-  local comment=$(make_details_with_header "Terraform \`plan\` Failed for Workspace: \`$WORKSPACE\`" "$RAW_INPUT")
+  local comment=$(make_details_with_header "Terraform \`plan\` Failed for Workspace: \`$WORKSPACE\`" "$INPUT")
 
   # Add plan comment to PR.
   make_and_post_payload "plan failure" "$comment"
