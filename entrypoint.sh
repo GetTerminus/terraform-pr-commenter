@@ -115,10 +115,11 @@ parse_args () {
 ###########
 make_and_post_payload () {
   # Add plan comment to PR.
-  PR_PAYLOAD=$(echo '{}' | jq --arg body "$1" '.body = $body')
-  info "Adding comment to PR."
-  debug "PR payload:\n$PR_PAYLOAD"
-  curl -sS -X POST -H "$AUTH_HEADER" -H "$ACCEPT_HEADER" -H "$CONTENT_HEADER" -d "$PR_PAYLOAD" -L "$PR_COMMENTS_URL" > /dev/null
+  local kind=$1
+  local pr_payload=$(echo '{}' | jq --arg body "$2" '.body = $body')
+  info "Adding $kind comment to PR."
+  debug "PR payload:\n$pr_payload"
+  curl -sS -X POST -H "$AUTH_HEADER" -H "$ACCEPT_HEADER" -H "$CONTENT_HEADER" -d "$pr_payload" -L "$PR_COMMENTS_URL" > /dev/null
 }
 
 # usage:  split_string target_array_name plan_text
@@ -200,15 +201,30 @@ post_comments () {
     if [ "$comment_count" -ne 1 ]; then
       comment_count_text=" ($((i+1))/$comment_count)"
     fi
-    local comment="$comment_prefix$comment_count_text
-<details$DETAILS_STATE><summary>Show Output</summary>
 
-\`\`\`diff
-$colorized_comment
+    local comment=$(make_details_with_header "$comment_prefix$comment_count_text" "$colorized_comment")
+    make_and_post_payload "$type" "$comment"
+  done
+}
+
+make_details_with_header() {
+  local header="### $1"
+  local body=$2
+  local pr_comment="$header
+$(make_details "Show Output" "$body")"
+  echo "$pr_comment"
+}
+
+make_details() {
+  local summary="$1"
+  local body=$2
+  local details="<details$DETAILS_STATE><summary>$summary</summary>
+
+\`\`\`
+$body
 \`\`\`
 </details>"
-    make_and_post_payload "$comment"
-  done
+  echo "$details"
 }
 
 ###############
@@ -240,30 +256,24 @@ plan_success () {
 }
 
 plan_fail () {
-  local comment="### Terraform \`plan\` Failed for Workspace: \`$WORKSPACE\`
-<details$DETAILS_STATE><summary>Show Output</summary>
-
-\`\`\`
-$RAW_INPUT
-\`\`\`
-</details>"
+  local comment=$(make_details_with_header "Terraform \`plan\` Failed for Workspace: \`$WORKSPACE\`" "$RAW_INPUT")
 
   # Add plan comment to PR.
-  make_and_post_payload "$(echo '{}' | jq --arg body "$comment" '.body = $body')"
+  make_and_post_payload "plan failure" "$comment"
 }
 
 post_plan_comments () {
   local clean_plan=$(echo "$INPUT" | perl -pe'$_="" unless /(An execution plan has been generated and is shown below.|Terraform used the selected providers to generate the following execution|No changes. Infrastructure is up-to-date.|No changes. Your infrastructure matches the configuration.)/ .. 1') # Strip refresh section
   clean_plan=$(echo "$clean_plan" | sed -r '/Plan: /q') # Ignore everything after plan summary
 
-  post_comments "plan" "### Terraform \`plan\` Succeeded for Workspace: \`$WORKSPACE\`" "$clean_plan"
+  post_comments "plan" "Terraform \`plan\` Succeeded for Workspace: \`$WORKSPACE\`" "$clean_plan"
 }
 
 post_outputs_comments() {
   local clean_plan=$(echo "$INPUT" | perl -pe'$_="" unless /Changes to Outputs:/ .. 1') # Skip to end of plan summary
   clean_plan=$(echo "$clean_plan" | sed -r '/------------------------------------------------------------------------/q') # Ignore everything after plan summary
 
-  post_comments "outputs" "### Changes to outputs for Workspace: \`$WORKSPACE\`" "$clean_plan"
+  post_comments "outputs" "Changes to outputs for Workspace: \`$WORKSPACE\`" "$clean_plan"
 }
 
 ##############
@@ -292,43 +302,32 @@ fmt_success () {
 }
 
 fmt_fail () {
+  local pr_comment
+
   # Exit Code: 1, 2
   # Meaning: 1 = Malformed Terraform CLI command. 2 = Terraform parse error.
   # Actions: Build PR comment.
   if [[ $EXIT_CODE -eq 1 || $EXIT_CODE -eq 2 ]]; then
-    PR_COMMENT="### Terraform \`fmt\` Failed
-<details$DETAILS_STATE><summary>Show Output</summary>
-
-\`\`\`
-$INPUT
-\`\`\`
-</details>"
+    pr_comment=$(make_details_with_header "Terraform \`fmt\` Failed" "$INPUT")
   fi
 
   # Exit Code: 3
   # Meaning: One or more files are incorrectly formatted.
   # Actions: Iterate over all files and build diff-based PR comment.
   if [[ $EXIT_CODE -eq 3 ]]; then
-    ALL_FILES_DIFF=""
+    local all_files_diff=""
     for file in $INPUT; do
-      THIS_FILE_DIFF=$(terraform fmt -no-color -write=false -diff "$file")
-      ALL_FILES_DIFF="$ALL_FILES_DIFF
-<details$DETAILS_STATE><summary><code>$file</code></summary>
-
-\`\`\`diff
-$THIS_FILE_DIFF
-\`\`\`
-</details>"
+      local this_file_diff=$(terraform fmt -no-color -write=false -diff "$file")
+      all_files_diff="$all_files_diff
+$(make_details "<code>$file</code>" "$this_file_diff")"
     done
 
-    PR_COMMENT="### Terraform \`fmt\` Failed
-$ALL_FILES_DIFF"
+    pr_comment="### Terraform \`fmt\` Failed
+$all_files_diff"
   fi
 
   # Add fmt failure comment to PR.
-  PR_PAYLOAD=$(echo '{}' | jq --arg body "$PR_COMMENT" '.body = $body')
-  info "Adding fmt failure comment to PR."
-  curl -sS -X POST -H "$AUTH_HEADER" -H "$ACCEPT_HEADER" -H "$CONTENT_HEADER" -d "$PR_PAYLOAD" -L "$PR_COMMENTS_URL" > /dev/null
+  make_and_post_payload "fmt failure" "$pr_comment"
 }
 
 ###############
@@ -357,18 +356,10 @@ init_success () {
 }
 
 init_fail () {
-  PR_COMMENT="### Terraform \`init\` Failed
-<details$DETAILS_STATE><summary>Show Output</summary>
-
-\`\`\`
-$INPUT
-\`\`\`
-</details>"
+  local pr_comment=$(make_details_with_header "Terraform \`init\` Failed" "$INPUT")
 
   # Add init failure comment to PR.
-  PR_PAYLOAD=$(echo '{}' | jq --arg body "$PR_COMMENT" '.body = $body')
-  info "Adding init failure comment to PR."
-  curl -sS -X POST -H "$AUTH_HEADER" -H "$ACCEPT_HEADER" -H "$CONTENT_HEADER" -d "$PR_PAYLOAD" -L "$PR_COMMENTS_URL" > /dev/null
+  make_and_post_payload "init failure" "$pr_comment"
 }
 
 ###################
@@ -397,20 +388,8 @@ validate_success () {
 }
 
 validate_fail () {
-  PR_COMMENT="### Terraform \`validate\` Failed
-<details$DETAILS_STATE><summary>Show Output</summary>
-
-\`\`\`
-$INPUT
-\`\`\`
-</details>"
-
-  # Add validate failure comment to PR.
-  PR_PAYLOAD=$(echo '{}' | jq --arg body "$PR_COMMENT" '.body = $body')
-  info "Adding validate failure comment to PR."
-  curl -sS -X POST -H "$AUTH_HEADER" -H "$ACCEPT_HEADER" -H "$CONTENT_HEADER" -d "$PR_PAYLOAD" -L "$PR_COMMENTS_URL" > /dev/null
-
-  exit 0
+  local pr_comment=$(make_details_with_header "Terraform \`validate\` Failed" "$INPUT")
+  make_and_post_payload "validate failure" "$pr_comment"
 }
 
 ###################
