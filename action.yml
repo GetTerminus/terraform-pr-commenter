@@ -11,7 +11,7 @@ inputs:
   commenter_input:
     description: 'The comment to post from a previous step output.  Will be trimmed to 64k length.'
     required: true
-  commenter_plan_file:
+  commenter_plan_path:
     description: 'The (optional) tfplan file'
     required: false
   commenter_exitcode:
@@ -31,6 +31,7 @@ runs:
     - name: Run commenter image (plan)
       env:
         COMMENTER_INPUT: ${{ inputs.commenter_input }}
+        COMMENTER_PLAN_FILE: ${{ inputs.commenter_plan_path }}
         GITHUB_EVENT: ${{ toJSON(github.event) }}
         AWS_SECRET_ACCESS_KEY: ${{ env.AWS_SECRET_KEY }}
       run: |

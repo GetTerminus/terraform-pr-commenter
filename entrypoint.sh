@@ -244,7 +244,7 @@ plan_fail () {
 <details$DETAILS_STATE><summary>Show Output</summary>
 
 \`\`\`
-$INPUT
+$RAW_INPUT
 \`\`\`
 </details>"
 
