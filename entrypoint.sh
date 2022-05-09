@@ -101,8 +101,7 @@ delete_existing_comments () {
     FOUND=true
     echo -e "\033[34;1mINFO:\033[0m Found existing $type PR comment: $PR_COMMENT_ID. Deleting."
     PR_COMMENT_URL="$PR_COMMENT_URI/$PR_COMMENT_ID"
-    # TODO comment back in
-    # curl -sS -X DELETE -H "$AUTH_HEADER" -H "$ACCEPT_HEADER" -L "$PR_COMMENT_URL" > /dev/null
+    curl -sS -X DELETE -H "$AUTH_HEADER" -H "$ACCEPT_HEADER" -L "$PR_COMMENT_URL" > /dev/null
   done
   if [ -z $FOUND ]; then
     echo -e "\033[34;1mINFO:\033[0m No existing $type PR comment found."
