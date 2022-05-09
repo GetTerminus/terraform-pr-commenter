@@ -121,12 +121,14 @@ plan_success () {
   debug "Total plan length: ${#clean_plan}"
   local plan_split
   split_plan plan_split "$clean_plan"
+  local comment_count=${#plan_split[@]}
 
-  info "Writing ${#plan_split[@]} plan comment(s)"
+  info "Writing $comment_count plan comment(s)"
 
-  for plan in "${plan_split[@]}"; do
+  for i in "${!plan_split[@]}"; do
+    local plan="${plan_split[$i]}"
     local colorized_plan=$(substitute_and_colorize "$plan")
-    local comment="### Terraform \`plan\` Succeeded for Workspace: \`$WORKSPACE\`
+    local comment="### Terraform \`plan\` Succeeded for Workspace: \`$WORKSPACE\` ($i/$comment_count)
 <details$DETAILS_STATE><summary>Show Output</summary>
 
 \`\`\`diff
@@ -151,7 +153,7 @@ $INPUT
 }
 
 execute_plan () {
-  delete_existing_comments 'plan' '### Terraform `plan` .* for Workspace: `'$WORKSPACE'`'
+  delete_existing_comments 'plan' '### Terraform `plan` .* for Workspace: `'$WORKSPACE'`.*'
 
   # Exit Code: 0, 2
   # Meaning: 0 = Terraform plan succeeded with no changes. 2 = Terraform plan succeeded with changes.
