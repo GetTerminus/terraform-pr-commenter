@@ -56,11 +56,12 @@ make_and_post_payload () {
 # usage:  split_plan target_array_name plan_text
 split_plan () {
   local -n split=$1
-  local remaining_plan=$2
+  local total_plan=$2
+  local remaining_plan=$total_plan
   local processed_plan_length=0
   split=()
 
-  debug "Total plan length to splot: ${#remaining_plan}"
+  debug "Total plan length to split: ${#remaining_plan}"
   # trim to the last newline that fits within length
   while [ ${#remaining_plan} -gt 0 ] ; do
     debug "Remaining plan: \n${remaining_plan}"
@@ -77,7 +78,7 @@ split_plan () {
     split+=("$current_plan")
 
     # bug:  we increment remaining plan before end of loop?
-    remaining_plan=${remaining_plan:processed_plan_length}
+    remaining_plan=${total_plan:processed_plan_length}
   done
 }
 
