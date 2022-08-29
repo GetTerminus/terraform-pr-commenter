@@ -160,15 +160,13 @@ substitute_and_colorize () {
 }
 
 get_page_count () {
-  info "Checking comment page count."
-
   local link_header
   local last_page=1
 
   link_header=$(curl -sSI -H "$AUTH_HEADER" -H "$ACCEPT_HEADER" -L "$PR_COMMENTS_URL" | grep -i ^link)
 
   # if I find a matching link header...
-  if echo "$link_header" | grep -Fi 'rel="next"'; then
+  if grep -Fi 'rel="next"' <<< "$link_header"; then
     # we found a next page -> find the last page
     IFS=',' read -ra links <<< "$link_header"
     for link in "${links[@]}"; do
@@ -177,17 +175,16 @@ get_page_count () {
       page_regex='^.*page=([0-9]+).*$'
 
       # if this is the 'last' ref...
-      if echo "$link" | grep -Fi 'rel="last"'; then
+      if grep -Fi 'rel="last"' <<< "$link" ; then
         if [[ $link =~ $page_regex ]]; then
           last_page="${BASH_REMATCH[1]}"
-          debug "Last page = $last_page"
           break
         fi
       fi
     done
   fi
 
-  echo "$last_page"
+  eval "$1"="$last_page"
 }
 
 delete_existing_comments () {
@@ -202,11 +199,13 @@ delete_existing_comments () {
   jq+=$regex
   jq+='")) | .id'
 
-  last_page=$(get_page_count)
+  # gross, but... bash.
+  get_page_count PAGE_COUNT
+  last_page=$PAGE_COUNT
   info "Found $last_page page(s) of comments."
 
   info "Looking for an existing $type PR comment."
-  for page in 1 .. $last_page
+  for page in $(seq $last_page)
   do
     for PR_COMMENT_ID in $(curl -sS -H "$AUTH_HEADER" -H "$ACCEPT_HEADER" -L "$PR_COMMENTS_URL&page=$page" | jq "$jq")
     do
