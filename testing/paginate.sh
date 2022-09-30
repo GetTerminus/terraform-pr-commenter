@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 set -x
 
 ACCEPT_HEADER="Accept: application/vnd.github.v3+json"
@@ -74,18 +74,24 @@ delete_existing_comments () {
   info "Found $last_page page(s) of comments at $PR_COMMENTS_URL."
 
   info "Looking for an existing $type PR comment."
+  local comment_ids=()
   for page in $(seq $last_page)
   do
-    for PR_COMMENT_ID in $(curl -sS -H "$AUTH_HEADER" -H "$ACCEPT_HEADER" -L "$PR_COMMENTS_URL&page=$page" | jq "$jq")
-    do
-      FOUND=true
-      info "Found existing $type PR comment: $PR_COMMENT_ID. Deleting."
-      PR_COMMENT_URL="$PR_COMMENT_URI/$PR_COMMENT_ID"
-      STATUS=$(curl -sS -X DELETE -H "$AUTH_HEADER" -H "$ACCEPT_HEADER" -o /dev/null -w "%{http_code}" -L "$PR_COMMENT_URL")
-      if [ "$STATUS" != "204"  ]; then
-        info "Failed to delete:  status $STATUS (most likely rate limited)"
-      fi
-    done
+    # first, we read *all* of the comment IDs across all pages.  saves us from the problem where we read a page, then
+    # delete some, then read the next page, *after* our page boundary has moved due to the delete.
+    # CAUTION.  this line assumes the PR_COMMENTS_URL already has at least one query parameter. (note the '&')
+    readarray -t -O "${#comment_ids[@]}" comment_ids < <(curl -sS -H "$AUTH_HEADER" -H "$ACCEPT_HEADER" -L "$PR_COMMENTS_URL&page=$page" | jq "$jq")
+  done
+
+  for PR_COMMENT_ID in "${comment_ids[@]}"
+  do
+    FOUND=true
+    info "Found existing $type PR comment: $PR_COMMENT_ID. Deleting."
+    PR_COMMENT_URL="$PR_COMMENT_URI/$PR_COMMENT_ID"
+#    STATUS=$(curl -sS -X DELETE -H "$AUTH_HEADER" -H "$ACCEPT_HEADER" -o /dev/null -w "%{http_code}" -L "$PR_COMMENT_URL")
+#    if [ "$STATUS" != "204"  ]; then
+#      info "Failed to delete:  status $STATUS (most likely rate limited)"
+#    fi
   done
 
   if [ -z $FOUND ]; then
