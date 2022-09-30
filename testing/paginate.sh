@@ -5,8 +5,9 @@ ACCEPT_HEADER="Accept: application/vnd.github.v3+json"
 AUTH_HEADER="Authorization: token $GH_TOKEN"
 CONTENT_HEADER="Content-Type: application/json"
 
-PR_COMMENTS_URL="https://api.github.com/repos/GetTerminus/eks-observability-infra/issues/4/comments"
-PR_COMMENT_URI="https://api.github.com/repos/GetTerminus/eks-observability-infra/issues/comments/4"
+PR_COMMENTS_URL="https://api.github.com/repositories/520589422/issues/7/comments?per_page=100"
+#PR_COMMENTS_URL="https://api.github.com/repos/GetTerminus/eks-autoscaling-infra/issues/7/comments"
+PR_COMMENT_URI="https://api.github.com/repositories/520589422/issues/comments/"
 
 PAGE_COUNT=1
 

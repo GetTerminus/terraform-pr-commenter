@@ -107,6 +107,8 @@ parse_args () {
   CONTENT_HEADER="Content-Type: application/json"
 
   PR_COMMENTS_URL=$(echo "$GITHUB_EVENT" | jq -r ".pull_request.comments_url")
+  PR_COMMENTS_URL+="&per_page=100"
+
   PR_COMMENT_URI=$(echo "$GITHUB_EVENT" | jq -r ".repository.issue_comment_url" | sed "s|{/number}||g")
 }
 
