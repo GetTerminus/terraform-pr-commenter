@@ -71,7 +71,7 @@ delete_existing_comments () {
   # gross, but... bash.
   get_page_count PAGE_COUNT
   last_page=$PAGE_COUNT
-  info "Found $last_page page(s) of comments."
+  info "Found $last_page page(s) of comments at $PR_COMMENTS_URL."
 
   info "Looking for an existing $type PR comment."
   for page in $(seq $last_page)

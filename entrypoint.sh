@@ -204,11 +204,12 @@ delete_existing_comments () {
   # gross, but... bash.
   get_page_count PAGE_COUNT
   last_page=$PAGE_COUNT
-  info "Found $last_page page(s) of comments."
+  info "Found $last_page page(s) of comments at $PR_COMMENTS_URL."
 
   info "Looking for an existing $type PR comment."
   for page in $(seq $last_page)
   do
+    # CAUTION.  this line assumes the PR_COMMENTS_URL already has at least one query parameter. (note the '&')
     for PR_COMMENT_ID in $(curl -sS -H "$AUTH_HEADER" -H "$ACCEPT_HEADER" -L "$PR_COMMENTS_URL&page=$page" | jq "$jq")
     do
       FOUND=true
