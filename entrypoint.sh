@@ -215,7 +215,10 @@ delete_existing_comments () {
       FOUND=true
       info "Found existing $type PR comment: $PR_COMMENT_ID. Deleting."
       PR_COMMENT_URL="$PR_COMMENT_URI/$PR_COMMENT_ID"
-      curl -sS -X DELETE -H "$AUTH_HEADER" -H "$ACCEPT_HEADER" -L "$PR_COMMENT_URL" > /dev/null
+      STATUS=$(curl -sS -X DELETE -H "$AUTH_HEADER" -H "$ACCEPT_HEADER" -o /dev/null -w "%{http_code}" -L "$PR_COMMENT_URL")
+      if [ "$STATUS" != "204"  ]; then
+        info "Failed to delete:  status $STATUS (most likely rate limited)"
+      fi
     done
   done
 

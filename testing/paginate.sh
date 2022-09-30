@@ -7,7 +7,7 @@ CONTENT_HEADER="Content-Type: application/json"
 
 PR_COMMENTS_URL="https://api.github.com/repositories/520589422/issues/7/comments?per_page=100"
 #PR_COMMENTS_URL="https://api.github.com/repos/GetTerminus/eks-autoscaling-infra/issues/7/comments"
-PR_COMMENT_URI="https://api.github.com/repositories/520589422/issues/comments/"
+PR_COMMENT_URI="https://api.github.com/repositories/520589422/issues/comments"
 
 PAGE_COUNT=1
 
@@ -81,7 +81,10 @@ delete_existing_comments () {
       FOUND=true
       info "Found existing $type PR comment: $PR_COMMENT_ID. Deleting."
       PR_COMMENT_URL="$PR_COMMENT_URI/$PR_COMMENT_ID"
-      #curl -sS -X DELETE -H "$AUTH_HEADER" -H "$ACCEPT_HEADER" -L "$PR_COMMENT_URL" > /dev/null
+      STATUS=$(curl -sS -X DELETE -H "$AUTH_HEADER" -H "$ACCEPT_HEADER" -o /dev/null -w "%{http_code}" -L "$PR_COMMENT_URL")
+      if [ "$STATUS" != "204"  ]; then
+        info "Failed to delete:  status $STATUS (most likely rate limited)"
+      fi
     done
   done
 
@@ -91,4 +94,5 @@ delete_existing_comments () {
 }
 
 WORKSPACE=prod-east
-delete_existing_comments 'plan' '### Terraform `plan` .* for Workspace: `'$WORKSPACE'`.*'
+#delete_existing_comments 'plan' '### Terraform `plan` .* for Workspace: `'$WORKSPACE'`.*'
+delete_existing_comments 'outputs' '### Changes to outputs for Workspace: `'$WORKSPACE'`.*'
