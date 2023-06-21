@@ -1,0 +1,22 @@
+3 issue(s) found:
+
+Warning: [Fixable] Interpolation-only expressions are deprecated in Terraform v0.12.14 (terraform_deprecated_interpolation)
+
+  on outputs.tf line 53:
+  53:   value = ["${aws_s3_bucket.test.*.bucket}"]
+
+Reference: https://github.com/terraform-linters/tflint-ruleset-terraform/blob/v0.4.0/docs/rules/terraform_deprecated_interpolation.md
+
+Warning: [Fixable] List items should be accessed using square brackets (terraform_deprecated_index)
+
+  on outputs.tf line 53:
+  53:   value = ["${aws_s3_bucket.test.*.bucket}"]
+
+Reference: https://github.com/terraform-linters/tflint-ruleset-terraform/blob/v0.4.0/docs/rules/terraform_deprecated_index.md
+
+Warning: [Fixable] data "aws_eks_cluster" "selected" is declared but not used (terraform_unused_declarations)
+
+  on providers.tf line 32:
+  32: data "aws_eks_cluster" "selected" {
+
+Reference: https://github.com/terraform-linters/tflint-ruleset-terraform/blob/v0.4.0/docs/rules/terraform_unused_declarations.md

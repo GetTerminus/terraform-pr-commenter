@@ -11,7 +11,7 @@
 [0m[1maws_secretsmanager_secret.artifactory[0]: Refreshing state... [id=arn:aws:secretsmanager:test_region:test_account_2:secret:test_secret_3][0m
 [0m[1mdata.aws_iam_policy_document.test_admin_policy_doc: Reading...[0m[0m
 [0m[1maws_secretsmanager_secret.github_app_pem_file[0]: Refreshing state... [id=arn:aws:secretsmanager:test_region:test_account_2:secret:test_secret_2][0m
-[0m[1maws_secretsmanager_secret.gh_ssh_key[0]: Refreshing state... [id=arn:aws:secretsmanager:test_region:test_account_2:secret:github-ssh-key-ydaDx6][0m
+[0m[1maws_secretsmanager_secret.gh_ssh_key[0]: Refreshing state... [id=arn:aws:secretsmanager:test_region:test_account_2:secret:test][0m
 [0m[1mmodule.test[0].module.kms.data.aws_partition.current: Read complete after 0s [id=aws][0m
 [0m[1mdata.aws_iam_policy_document.test_admin_policy_doc: Read complete after 0s [id=test_id][0m
 [0m[1mdata.aws_iam_policy_document.test_admin_arp: Read complete after 0s [id=test_id][0m

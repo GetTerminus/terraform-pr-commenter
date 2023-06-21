@@ -3,7 +3,7 @@
 [0m[1mdata.github_team.owner: Reading...[0m[0m
 [0m[1mdata.aws_test_cluster.selected: Reading...[0m[0m
 [0m[1maws_secretsmanager_secret.gh_read_token[0]: Refreshing state... [id=arn:aws:secretsmanager:test_region:test_account_2:secret:test_secret_4][0m
-[0m[1maws_secretsmanager_secret.gh_ssh_key[0]: Refreshing state... [id=arn:aws:secretsmanager:test_region:test_account_2:secret:github-ssh-key-ydaDx6][0m
+[0m[1maws_secretsmanager_secret.gh_ssh_key[0]: Refreshing state... [id=arn:aws:secretsmanager:test_region:test_account_2:secret:test][0m
 [0m[1mmodule.test[0].module.kms.data.aws_partition.current: Reading...[0m[0m
 [0m[1maws_secretsmanager_secret.artifactory[0]: Refreshing state... [id=arn:aws:secretsmanager:test_region:test_account_2:secret:test_secret_3][0m
 [0m[1mmodule.test[0].module.kms.data.aws_caller_identity.current: Reading...[0m[0m

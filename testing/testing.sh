@@ -1516,12 +1516,12 @@ Terraform will perform the following actions:
           - "external_webhook_delivery_infra",
           - "federated-infra-template",
           - "helm-charts",
-          - "infra-terminus-ninja",
+          - "infra-terminus-test",
           - "java-ci-image",
           - "linkedin_service_infra",
           - "monitor-dashboard",
           - "my_terminus_infra",
-          - "ninja-mailcatcher",
+          - "test-mailcatcher",
           - "notification_service_infra",
           - "orb-domain-lookup-infra",
           - "platform-browser-identity",
@@ -1694,12 +1694,12 @@ Terraform will perform the following actions:
           - "external_webhook_delivery_infra",
           - "federated-infra-template",
           - "helm-charts",
-          - "infra-terminus-ninja",
+          - "infra-terminus-test",
           - "java-ci-image",
           - "linkedin_service_infra",
           - "monitor-dashboard",
           - "my_terminus_infra",
-          - "ninja-mailcatcher",
+          - "test-mailcatcher",
           - "notification_service_infra",
           - "orb-domain-lookup-infra",
           - "platform-browser-identity",
@@ -1798,12 +1798,12 @@ Terraform will perform the following actions:
           - "external_webhook_delivery_infra",
           - "federated-infra-template",
           - "helm-charts",
-          - "infra-terminus-ninja",
+          - "infra-terminus-test",
           - "java-ci-image",
           - "linkedin_service_infra",
           - "monitor-dashboard",
           - "my_terminus_infra",
-          - "ninja-mailcatcher",
+          - "test-mailcatcher",
           - "notification_service_infra",
           - "orb-domain-lookup-infra",
           - "platform-browser-identity",
@@ -2333,9 +2333,9 @@ Terraform will perform the following actions:
       [32m+[0m [0m[1m[0marn[0m[0m         = (known after apply)
       [32m+[0m [0m[1m[0mcreate_date[0m[0m = (known after apply)
       [32m+[0m [0m[1m[0mid[0m[0m          = (known after apply)
-      [32m+[0m [0m[1m[0mname[0m[0m        = "KarpenterNodeInstanceProfile-ninja-relaxing-baboon"
+      [32m+[0m [0m[1m[0mname[0m[0m        = "KarpenterNodeInstanceProfile-test-relaxing-baboon"
       [32m+[0m [0m[1m[0mpath[0m[0m        = "/"
-      [32m+[0m [0m[1m[0mrole[0m[0m        = "ninja-relaxing-baboon20191021193910208300000006"
+      [32m+[0m [0m[1m[0mrole[0m[0m        = "test-relaxing-baboon20191021193910208300000006"
       [32m+[0m [0m[1m[0mtags_all[0m[0m    = (known after apply)
       [32m+[0m [0m[1m[0munique_id[0m[0m   = (known after apply)
     }
@@ -2407,7 +2407,7 @@ PR_COMMENTS_URL="https://api.github.com/repos/GetTerminus/eks-observability-infr
 PR_COMMENT_URI="https://api.github.com/repos/GetTerminus/eks-observability-infra/issues/comments/4"
 # curl -sSi -H "$AUTH_HEADER" -H "$ACCEPT_HEADER" -L $PR_COMMENTS_URL
 
-WORKSPACE=ninja
+WORKSPACE=test
 POST_PLAN_OUTPUTS=true
 
 execute_plan
