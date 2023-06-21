@@ -133,17 +133,13 @@ delimiter_start_cmd_builder () {
   delimiter_string=$(print_start_delimiter_string "$@")
   delimiter_string=${delimiter_string::-1} #Get rid of trailing `|`
 
-  debug "Delimiter Start CMD: $delimiter_string"
-
   printf "\$_=\"\" unless /(%s)/ .. 1" "$delimiter_string"
 }
 
 delimiter_end_cmd_builder () {
   local delimiter_string
 
-  delimiter_string=$(printf "/%s/q" "$1")
-
-  debug "Delimiter End CMD: $delimiter_string"
+  printf "/%s/q" "$1"
 }
 
 print_start_delimiter_string ()
