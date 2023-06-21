@@ -130,7 +130,7 @@ color_red () {
 start_delimiter_builder () {
   local delimiter_string
   delimiter_string=$(print_array "$@")
-  printf '$_="" unless /(%s)/ .. 1' "${delimiter_string}"
+  printf "$_="" unless /(%s)/ .. 1" "${delimiter_string}"
 }
 
 end_delimiter_builder () {

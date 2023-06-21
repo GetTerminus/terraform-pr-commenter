@@ -59,7 +59,7 @@ post_plan_comments () {
   debug "Delimiter Test"
   echo "${start_delimiter}"
 
-  clean_input=$(echo "$INPUT" | perl -pe'${start_delimiter}')
+  clean_input=$(echo "$INPUT" | perl -pe'$start_delimiter')
   clean_input=$(echo "$clean_input" | sed -r "${end_delimiter}")
 
   post_diff_comments "plan" "Terraform \`plan\` Succeeded for Workspace: \`$WORKSPACE\`" "$clean_input"
