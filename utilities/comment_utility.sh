@@ -127,9 +127,14 @@ color_red () {
   echo "\033[31;1m$1\033[0m"
 }
 
-delimiter_builder () {
-  local delimiter_string=$(print_array "$@")
-  printf '$_="" unless /(%s)/ .. 1' "$delimiter_string"
+start_delimiter_builder () {
+  local delimiter_string
+  delimiter_string=$(print_array "$@")
+  printf "$_="" unless /(%s)/ .. 1" "${delimiter_string}"
+}
+
+end_delimiter_builder () {
+  printf "%s/q" "$1"
 }
 
 print_array ()
