@@ -49,14 +49,14 @@ plan_fail () {
   delimiter_strings+=("Planning failed. Terraform encountered an error while generating this plan.")
   delimiter_strings+=("Terraform planned the following actions, but then encountered a problem:")
 
-  local delimiter=$(print_array "${delimiter_strings[@]}")
+  local delimiter=$(delimiter_builder "${delimiter_strings[@]}")
 
   debug "Test Delimiter"
   echo "$delimiter"
 
   #clean_input=$(echo "$INPUT" | perl -pe'$_="" unless /(Planning failed. Terraform encountered an error while generating this plan.|Terraform planned the following actions, but then encountered a problem:)/ .. 1')
   #clean_input=$(echo "$INPUT" | perl -pe'$delimiter')
-  clean_input=$(echo "$INPUT" | perl -pe'$_="" unless /(${delimiter})/ .. 1')
+  clean_input=$(echo "$INPUT" | perl -pe${delimiter})
   comment=$(make_details_with_header "Terraform \`plan\` Failed for Workspace: \`$WORKSPACE\`" "$clean_input" "diff")
 
   # Add comment to PR.
