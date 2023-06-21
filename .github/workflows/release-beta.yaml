@@ -2,8 +2,6 @@ name: Release Beta
 
 on:
   pull-request:
-    branches-ignore:
-      - master
 
 jobs:
   release-beta:
