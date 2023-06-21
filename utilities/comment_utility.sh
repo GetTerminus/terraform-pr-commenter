@@ -136,9 +136,15 @@ print_array ()
 {
   # run through array and print each entry:
   local array
+  local last_index
   array=("$@")
+  last_index=$((${#array[@]} - 1))
   for i in "${array[@]}" ; do
+    if [[ last_index == $i ]]; then
+      printf '%s' "$i"
+    else
       printf '%s|' "$i"
+    fi
   done
 }
 
