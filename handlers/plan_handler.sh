@@ -33,7 +33,8 @@ plan_fail () {
   comment=$(make_details_with_header "Terraform \`plan\` Failed for Workspace: \`$WORKSPACE\`" "$clean_input" "diff")
 
   # Add comment to PR.
-  make_and_post_payload "plan failure" "$comment"
+  #make_and_post_payload "plan failure" "$comment"
+  post_diff_comments "plan" "Terraform \`plan\` Failed for Workspace: \`$WORKSPACE\`" "$clean_input"
 }
 
 post_plan_comments () {
