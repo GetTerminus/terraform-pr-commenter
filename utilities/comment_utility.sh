@@ -129,6 +129,7 @@ color_red () {
 
 delimiter_builder () {
   local delimiter_string=$(print_array "$@")
+  delimiter_string=${delimiter_string::-1}
   printf "\'\$_=\"\" unless /(%s)/ .. 1\'" "$delimiter_string"
 }
 
@@ -136,15 +137,9 @@ print_array ()
 {
   # run through array and print each entry:
   local array
-  local last_index
   array=("$@")
-  last_index=$((${#array[@]} - 1))
   for i in "${array[@]}" ; do
-    if [[ $last_index == $i ]]; then
-      printf '%s' "$i"
-    else
-      printf '%s|' "$i"
-    fi
+    printf '%s|' "$i"
   done
 }
 
