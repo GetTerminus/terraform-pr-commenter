@@ -2,7 +2,8 @@ name: Test
 
 on:
   workflow_run:
-    workflows: [Release Beta]
+    workflows:
+      - Release Beta
     types:
       - completed
 
