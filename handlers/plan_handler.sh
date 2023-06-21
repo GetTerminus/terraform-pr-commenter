@@ -25,37 +25,16 @@ plan_success () {
   fi
 }
 
-#plan_fail () {
-#  local clean_input
-#  local start_delimiter_strings=()
-#  local start_delimiter
-#
-#  start_delimiter_strings+="Planning failed. Terraform encountered an error while generating this plan."
-#  start_delimiter_strings+="Terraform planned the following actions, but then encountered a problem:"
-#
-#  # shellcheck disable=SC2034
-#  start_delimiter=$(start_delimiter_builder "${start_delimiter_strings[@]}")
-#
-#  clean_input=$(echo "$INPUT" | perl -pe'${start_delimiter}')
-#
-#  post_diff_comments "plan" "Terraform \`plan\` Failed for Workspace: \`$WORKSPACE\`" "$clean_input"
-#}
-
 plan_fail () {
   local clean_input
-  local start_delimiter_strings=()
   local delimiter_start_cmd
+  local start_delimiter_strings=()
 
   start_delimiter_strings+=("Planning failed. Terraform encountered an error while generating this plan.")
   start_delimiter_strings+=("Terraform planned the following actions, but then encountered a problem:")
 
   delimiter_start_cmd=$(delimiter_start_cmd_builder "${start_delimiter_strings[@]}")
 
-  debug "Test Delimiter"
-  echo "$delimiter_start_cmd"
-
-  #clean_input=$(echo "$INPUT" | perl -pe'$_="" unless /(Planning failed. Terraform encountered an error while generating this plan.|Terraform planned the following actions, but then encountered a problem:)/ .. 1')
-  #clean_input=$(echo "$INPUT" | perl -pe'$delimiter')
   clean_input=$(echo "$INPUT" | perl -pe "${delimiter_start_cmd}")
 
   post_diff_comments "plan" "Terraform \`plan\` Failed for Workspace: \`$WORKSPACE\`" "$clean_input"
@@ -64,21 +43,20 @@ plan_fail () {
 post_plan_comments () {
   local clean_input
   local start_delimiter_strings=()
-  local start_delimiter
-  local end_delimiter
+  local delimiter_start_cmd
+  local delimiter_end_cmd
 
   start_delimiter_strings+=("An execution plan has been generated and is shown below.")
   start_delimiter_strings+=("Terraform used the selected providers to generate the following execution")
   start_delimiter_strings+=("No changes. Infrastructure is up-to-date.")
   start_delimiter_strings+=("No changes. Your infrastructure matches the configuration.")
 
-  # shellcheck disable=SC2034
-  start_delimiter=$(start_delimiter_builder "${start_delimiter_strings[@]}")
-  end_delimiter=$(end_delimiter_builder "/Plan: ")
+  delimiter_start_cmd=$(delimiter_start_cmd_builder "${start_delimiter_strings[@]}")
+  delimiter_end_cmd=$(delimiter_end_cmd_builder "/Plan: ")
 
   #clean_input=$(echo "$INPUT" | perl -pe'$_="" unless /(An execution plan has been generated and is shown below.|Terraform used the selected providers to generate the following execution|No changes. Infrastructure is up-to-date.|No changes. Your infrastructure matches the configuration.)/ .. 1')
   clean_input=$(echo "$INPUT" | perl -pe'$start_delimiter')
-  clean_input=$(echo "$clean_input" | sed -r "${end_delimiter}")
+  clean_input=$(echo "$clean_input" | sed -r "${delimiter_end_cmd}")
 
   post_diff_comments "plan" "Terraform \`plan\` Succeeded for Workspace: \`$WORKSPACE\`" "$clean_input"
 }
