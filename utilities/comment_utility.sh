@@ -141,7 +141,7 @@ delimiter_start_cmd_builder () {
 delimiter_end_cmd_builder () {
   local delimiter_string
 
-  delimiter_string=$(printf "%s/q" "$1")
+  delimiter_string=$(printf "/%s/q" "$1")
 
   debug "Delimiter End CMD: $delimiter_string"
 }
