@@ -56,7 +56,7 @@ plan_fail () {
 
   #clean_input=$(echo "$INPUT" | perl -pe'$_="" unless /(Planning failed. Terraform encountered an error while generating this plan.|Terraform planned the following actions, but then encountered a problem:)/ .. 1')
   #clean_input=$(echo "$INPUT" | perl -pe'$delimiter')
-  clean_input=$(echo "$INPUT" | eval "$delimiter")
+  clean_input=$(echo "$INPUT" | perl -pe"$delimiter")
   comment=$(make_details_with_header "Terraform \`plan\` Failed for Workspace: \`$WORKSPACE\`" "$clean_input" "diff")
 
   # Add comment to PR.
