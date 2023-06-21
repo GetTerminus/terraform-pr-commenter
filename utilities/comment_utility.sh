@@ -140,7 +140,7 @@ print_array ()
   array=("$@")
   last_index=$((${#array[@]} - 1))
   for i in "${array[@]}" ; do
-    if [[ last_index == $i ]]; then
+    if [[ $last_index == $i ]]; then
       printf '%s' "$i"
     else
       printf '%s|' "$i"
