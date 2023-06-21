@@ -1,0 +1,80 @@
+[command]/home/runner/work/_temp/ca8fed5e-6bcd-4d45-9fff-0893ca1b02e0/terraform-bin init -lock=false -input=false -upgrade
+
+[0m[1mInitializing the backend...[0m
+[0m[32m
+Successfully configured the backend "s3"! Terraform will automatically
+use this backend unless the backend configuration changes.[0m
+[0m[1mUpgrading modules...[0m
+- aws_vpc_cni in modules/aws-vpc-cni
+- cert_manager in modules/cert-manager
+Downloading git::ssh://git@github.com/TestOwner/tf-module-test-oidc.git?ref=v1 for cluster_oidc_data...
+- cluster_oidc_data in .terraform/modules/cluster_oidc_data
+- ebs_csi_driver in modules/ebs-csi-driver
+- test in modules/test-18.30.3
+- test.test_managed_node_group in modules/test-18.30.3/modules/test-managed-node-group
+- test.test_managed_node_group.user_data in modules/test-18.30.3/modules/_user_data
+- test.fargate_profile in modules/test-18.30.3/modules/fargate-profile
+Downloading registry.terraform.io/terraform-aws-modules/kms/aws 1.0.2 for test.kms...
+- test.kms in .terraform/modules/test.kms
+- test.self_managed_node_group in modules/test-18.30.3/modules/self-managed-node-group
+- test.self_managed_node_group.user_data in modules/test-18.30.3/modules/_user_data
+Downloading git::ssh://git@github.com/TestOwner/tf-module-test-namespace.git?ref=v1.3.3 for test_namespace_cert_manager...
+- test_namespace_cert_manager in .terraform/modules/test_namespace_cert_manager
+Downloading git::ssh://git@github.com/TestOwner/tf-module-test-namespace.git?ref=v1.3.3 for test_namespace_terminus_system...
+- test_namespace_terminus_system in .terraform/modules/test_namespace_terminus_system
+- test_vpc in modules/vpc
+- prod_east_vpc_peering in modules/vpc-peering
+- secrets_store in modules/secrets-store
+
+[0m[1mInitializing provider plugins...[0m
+- Finding datadog/datadog versions matching ">= 3.18.0"...
+- Finding latest version of hashicorp/helm...
+- Finding hashicorp/kubernetes versions matching ">= 2.10.0, >= 2.16.1"...
+- Finding hashicorp/random versions matching ">= 3.4.0"...
+- Finding hashicorp/tls versions matching ">= 3.0.0"...
+- Finding hashicorp/cloudinit versions matching ">= 2.0.0"...
+- Finding latest version of hashicorp/null...
+- Finding hashicorp/aws versions matching ">= 3.10.0, >= 3.72.0, >= 4.45.0"...
+- Finding integrations/github versions matching ">= 5.11.0"...
+- Finding hashicorp/helmx versions matching ">= 2.5.1"...
+- Installing datadog/datadog v3.26.0...
+- Installed datadog/datadog v3.26.0 (signed by a HashiCorp partner, key ID [0m[1mFB70BE941301C3EA[0m[0m)
+- Installing hashicorp/kubernetes v2.21.1...
+- Installed hashicorp/kubernetes v2.21.1 (signed by HashiCorp)
+- Installing hashicorp/random v3.5.1...
+- Installed hashicorp/random v3.5.1 (signed by HashiCorp)
+- Installing hashicorp/helm v2.10.1...
+- Installed hashicorp/helm v2.10.1 (signed by HashiCorp)
+- Installing hashicorp/tls v4.0.4...
+- Installed hashicorp/tls v4.0.4 (signed by HashiCorp)
+- Installing hashicorp/cloudinit v2.3.2...
+- Installed hashicorp/cloudinit v2.3.2 (signed by HashiCorp)
+- Installing hashicorp/null v3.2.1...
+- Installed hashicorp/null v3.2.1 (signed by HashiCorp)
+- Installing hashicorp/aws v5.3.0...
+- Installed hashicorp/aws v5.3.0 (signed by HashiCorp)
+- Installing integrations/github v5.26.0...
+- Installed integrations/github v5.26.0 (signed by a HashiCorp partner, key ID [0m[1m38027F80D7FD5FB2[0m[0m)
+
+Partner and community providers are signed by their developers.
+If you'd like to know more about provider signing, you can read about it here:
+https://www.terraform.io/docs/cli/plugins/signing.html
+[31m[31m╷[0m[0m
+[31m│[0m [0m[1m[31mError: [0m[0m[1mFailed to query available provider packages[0m
+[31m│[0m [0m
+[31m│[0m [0m[0mCould not retrieve the list of available versions for provider
+[31m│[0m [0mhashicorp/helmx: provider registry registry.terraform.io does not have a
+[31m│[0m [0mprovider named registry.terraform.io/hashicorp/helmx
+[31m│[0m [0m
+[31m│[0m [0mAll modules should specify their required_providers so that external
+[31m│[0m [0mconsumers will get the correct providers when using a module. To see which
+[31m│[0m [0mmodules are currently depending on hashicorp/helmx, run the following
+[31m│[0m [0mcommand:
+[31m│[0m [0m    terraform providers
+[31m╵[0m[0m
+[0m[0m
+::debug::Terraform exited with code 1.
+::debug::stdout: %0A[0m[1mInitializing the backend...[0m%0A[0m[32m%0ASuccessfully configured the backend "s3"! Terraform will automatically%0Ause this backend unless the backend configuration changes.[0m%0A[0m[1mUpgrading modules...[0m%0A- aws_vpc_cni in modules/aws-vpc-cni%0A- cert_manager in modules/cert-manager%0ADownloading git::ssh://git@github.com/TestOwner/tf-module-test-oidc.git?ref=v1 for cluster_oidc_data...%0A- cluster_oidc_data in .terraform/modules/cluster_oidc_data%0A- ebs_csi_driver in modules/ebs-csi-driver%0A- test in modules/test-18.30.3%0A- test.test_managed_node_group in modules/test-18.30.3/modules/test-managed-node-group%0A- test.test_managed_node_group.user_data in modules/test-18.30.3/modules/_user_data%0A- test.fargate_profile in modules/test-18.30.3/modules/fargate-profile%0ADownloading registry.terraform.io/terraform-aws-modules/kms/aws 1.0.2 for test.kms...%0A- test.kms in .terraform/modules/test.kms%0A- test.self_managed_node_group in modules/test-18.30.3/modules/self-managed-node-group%0A- test.self_managed_node_group.user_data in modules/test-18.30.3/modules/_user_data%0ADownloading git::ssh://git@github.com/TestOwner/tf-module-test-namespace.git?ref=v1.3.3 for test_namespace_cert_manager...%0A- test_namespace_cert_manager in .terraform/modules/test_namespace_cert_manager%0ADownloading git::ssh://git@github.com/TestOwner/tf-module-test-namespace.git?ref=v1.3.3 for test_namespace_terminus_system...%0A- test_namespace_terminus_system in .terraform/modules/test_namespace_terminus_system%0A- test_vpc in modules/vpc%0A- prod_east_vpc_peering in modules/vpc-peering%0A- secrets_store in modules/secrets-store%0A%0A[0m[1mInitializing provider plugins...[0m%0A- Finding datadog/datadog versions matching ">= 3.18.0"...%0A- Finding latest version of hashicorp/helm...%0A- Finding hashicorp/kubernetes versions matching ">= 2.10.0, >= 2.16.1"...%0A- Finding hashicorp/random versions matching ">= 3.4.0"...%0A- Finding hashicorp/tls versions matching ">= 3.0.0"...%0A- Finding hashicorp/cloudinit versions matching ">= 2.0.0"...%0A- Finding latest version of hashicorp/null...%0A- Finding hashicorp/aws versions matching ">= 3.10.0, >= 3.72.0, >= 4.45.0"...%0A- Finding integrations/github versions matching ">= 5.11.0"...%0A- Finding hashicorp/helmx versions matching ">= 2.5.1"...%0A- Installing datadog/datadog v3.26.0...%0A- Installed datadog/datadog v3.26.0 (signed by a HashiCorp partner, key ID [0m[1mFB70BE941301C3EA[0m[0m)%0A- Installing hashicorp/kubernetes v2.21.1...%0A- Installed hashicorp/kubernetes v2.21.1 (signed by HashiCorp)%0A- Installing hashicorp/random v3.5.1...%0A- Installed hashicorp/random v3.5.1 (signed by HashiCorp)%0A- Installing hashicorp/helm v2.10.1...%0A- Installed hashicorp/helm v2.10.1 (signed by HashiCorp)%0A- Installing hashicorp/tls v4.0.4...%0A- Installed hashicorp/tls v4.0.4 (signed by HashiCorp)%0A- Installing hashicorp/cloudinit v2.3.2...%0A- Installed hashicorp/cloudinit v2.3.2 (signed by HashiCorp)%0A- Installing hashicorp/null v3.2.1...%0A- Installed hashicorp/null v3.2.1 (signed by HashiCorp)%0A- Installing hashicorp/aws v5.3.0...%0A- Installed hashicorp/aws v5.3.0 (signed by HashiCorp)%0A- Installing integrations/github v5.26.0...%0A- Installed integrations/github v5.26.0 (signed by a HashiCorp partner, key ID [0m[1m38027F80D7FD5FB2[0m[0m)%0A%0APartner and community providers are signed by their developers.%0AIf you'd like to know more about provider signing, you can read about it here:%0Ahttps://www.terraform.io/docs/cli/plugins/signing.html%0A
+::debug::stderr: [31m[31m╷[0m[0m%0A[31m│[0m [0m[1m[31mError: [0m[0m[1mFailed to query available provider packages[0m%0A[31m│[0m [0m%0A[31m│[0m [0m[0mCould not retrieve the list of available versions for provider%0A[31m│[0m [0mhashicorp/helmx: provider registry registry.terraform.io does not have a%0A[31m│[0m [0mprovider named registry.terraform.io/hashicorp/helmx%0A[31m│[0m [0m%0A[31m│[0m [0mAll modules should specify their required_providers so that external%0A[31m│[0m [0mconsumers will get the correct providers when using a module. To see which%0A[31m│[0m [0mmodules are currently depending on hashicorp/helmx, run the following%0A[31m│[0m [0mcommand:%0A[31m│[0m [0m    terraform providers%0A[31m╵[0m[0m%0A[0m[0m%0A
+::debug::exitcode: 1
+::error::Terraform exited with code 1.

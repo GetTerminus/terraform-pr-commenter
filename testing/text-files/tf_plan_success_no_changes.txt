@@ -1,0 +1,30 @@
+[command]/home/runner/work/_temp/7befa20f-0a52-46e8-a3d1-31deb8143268/terraform-bin plan -var-file=vars/test.tfvars -var-file=vars/test-vpc.tfvars -var-file=vars/test.tfvars -lock=false -input=false
+[0m[1mrandom_pet.test: Refreshing state... [id=test][0m
+[0m[1mdata.github_team.owner: Reading...[0m[0m
+[0m[1mdata.aws_caller_identity.test: Reading...[0m[0m
+[0m[1mdata.aws_caller_identity.test: Read complete after 0s [id=test_account][0m
+[0m[1mmodule.test[0].data.aws_caller_identity.current: Reading...[0m[0m
+[0m[1mdata.aws_test_cluster.selected: Reading...[0m[0m
+[0m[1maws_secretsmanager_secret.artifactory[0]: Refreshing state... [id=arn:aws:secretsmanager:test_region:test_account_2:secret:test_secret_3][0m
+
+[0m[1m[32mNo changes.[0m[1m Your infrastructure matches the configuration.[0m
+
+[0mTerraform has compared your real infrastructure against your configuration
+and found no differences, so no changes are needed.
+[33m╷[0m[0m
+[33m│[0m [0m[1m[33mWarning: [0m[0m[1mArgument is deprecated[0m
+[33m│[0m [0m
+[33m│[0m [0m[0m  with aws_test_addon.test,
+[33m│[0m [0m  on test-addons.tf line 6, in resource "aws_test_addon" "test":
+[33m│[0m [0m   6:   resolve_conflicts = [4m"OVERWRITE"[0m[0m
+[33m│[0m [0m
+[33m│[0m [0mThe "resolve_conflicts" attribute can't be set to "PRESERVE" on initial
+[33m│[0m [0mresource creation. Use "resolve_conflicts_on_create" and/or
+[33m│[0m [0m"resolve_conflicts_on_update" instead
+[33m│[0m [0m
+[33m│[0m [0m(and 9 more similar warnings elsewhere)
+[33m╵[0m[0m
+::debug::Terraform exited with code 0.
+::debug::stdout: [0m[1mtest%0A[33m╵[0m[0m%0A
+::debug::stderr: 
+::debug::exitcode: 0

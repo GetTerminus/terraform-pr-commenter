@@ -1,0 +1,73 @@
+[command]/home/runner/work/_temp/f32b90ae-4c39-475f-9c04-a29ad035e7a3/terraform-bin plan -var-file=vars/test.tfvars -var-file=vars/test-vpc.tfvars -var-file=vars/test.tfvars -lock=false -input=false
+[0m[1mrandom_pet.test: Refreshing state... [id=test][0m
+[0m[1mdata.github_team.owner: Reading...[0m[0m
+[0m[1mdata.aws_caller_identity.test: Reading...[0m[0m
+[0m[1mdata.aws_caller_identity.test: Read complete after 0s [id=test_account][0m
+[0m[1mmodule.test_vpc.data.aws_vpc_endpoint_service.s3[0]: Reading...[0m[0m
+[0m[1maws_secretsmanager_secret.buoyant_client_id[0]: Refreshing state... [id=arn:aws:secretsmanager:test_region:test_account_2:secret:test_secret_1][0m
+[0m[1mmodule.test[0].module.kms.data.aws_partition.current: Reading...[0m[0m
+[0m[1maws_secretsmanager_secret.github_app_pem_file[0]: Refreshing state... [id=arn:aws:secretsmanager:test_region:test_account_2:secret:test_secret_2][0m
+[0m[1mmodule.test[0].data.aws_caller_identity.current: Reading...[0m[0m
+[0m[1mmodule.test[0].data.aws_partition.current: Reading...[0m[0m
+[0m[1mmodule.test[0].data.aws_partition.current: Read complete after 0s [id=aws][0m
+[0m[1mdata.aws_iam_policy_document.test_admin_arp: Reading...[0m[0m
+[0m[1mdata.aws_region.current: Reading...[0m[0m
+[0m[1mmodule.test[0].module.kms.data.aws_partition.current: Read complete after 0s [id=aws][0m
+[0m[1maws_secretsmanager_secret.gh_ssh_key[0]: Refreshing state... [id=arn:aws:secretsmanager:test_region:test_account_2:secret:github-ssh-key-ydaDx6][0m
+[0m[1mdata.aws_iam_policy_document.test_admin_arp: Read complete after 0s [id=test_id][0m
+[0m[1maws_secretsmanager_secret.github_app_installation_id[0]: Refreshing state... [id=arn:aws:secretsmanager:test_region:test_account_2:secret:github-app-installation-id-Vd15D6][0m
+[0m[1maws_secretsmanager_secret.artifactory[0]: Refreshing state... [id=arn:aws:secretsmanager:test_region:test_account_2:secret:test_secret_3][0m
+[0m[1mdata.aws_region.current: Read complete after 0s [id=test_region][0m
+[0m[1mdata.aws_iam_policy_document.test_admin_policy_doc: Reading...[0m[0m
+[0m[1maws_secretsmanager_secret.gh_read_token[0]: Refreshing state... [id=arn:aws:secretsmanager:test_region:test_account_2:secret:test_secret_4][0m
+[0m[1mdata.aws_iam_policy_document.test_admin_policy_doc: Read complete after 0s [id=test_id][0m
+[0m[1mmodule.test[0].module.kms.data.aws_caller_identity.current: Reading...[0m[0m
+[0m[1mmodule.test[0].data.aws_caller_identity.current: Read complete after 0s [id=test_account_2][0m
+[0m[1maws_secretsmanager_secret.gh_deployment_token[0]: Refreshing state... [id=arn:aws:secretsmanager:test_region:test_account_2:secret:github-deployment-token-BNfePC][0m
+[0m[1mmodule.test[0].module.kms.data.aws_caller_identity.current: Read complete after 0s [id=test_account_2][0m
+[0m[1maws_secretsmanager_secret.pagerduty_api_token[0]: Refreshing state... [id=arn:aws:secretsmanager:test_region:test_account_2:secret:pagerduty-api-token-bRH21U][0m
+[0m[1maws_secretsmanager_secret.gh_devops_token[0]: Refreshing state... [id=arn:aws:secretsmanager:test_region:test_account_2:secret:github-devops-token-eNlLKE][0m
+[0m[1maws_secretsmanager_secret.buoyant_client_secret[0]: Refreshing state... [id=arn:aws:secretsmanager:test_region:test_account_2:secret:buoyant-client-secret-531YW0][0m
+[0m[1maws_secretsmanager_secret.gh_pull_access_token[0]: Refreshing state... [id=arn:aws:secretsmanager:test_region:test_account_2:secret:github-pull-access-token-042mpL][0m
+[0m[1mmodule.ebs_csi_driver[0].data.aws_iam_policy.ebs_csi_policy: Reading...[0m[0m
+[0m[1maws_secretsmanager_secret.github_app_id[0]: Refreshing state... [id=arn:aws:secretsmanager:test_region:test_account_2:secret:github-app-id-s3Tr30][0m
+[0m[1mmodule.test_vpc.data.aws_vpc_endpoint_service.dynamodb[0]: Reading...[0m[0m
+[0m[1mmodule.test[0].data.aws_default_tags.current: Reading...[0m[0m
+
+[0m[1m[31mPlanning failed.[0m[1m Terraform encountered an error while generating this plan.[0m
+
+[0m[33m╷[0m[0m
+[33m│[0m [0m[1m[33mWarning: [0m[0m[1mArgument is deprecated[0m
+[33m│[0m [0m
+[33m│[0m [0m[0m  with aws_test_addon.test,
+[33m│[0m [0m  on test-addons.tf line 6, in resource "aws_test_addon" "test":
+[33m│[0m [0m   6:   resolve_conflicts = [4m"OVERWRITE"[0m[0m
+[33m│[0m [0m
+[33m│[0m [0mThe "resolve_conflicts" attribute can't be set to "PRESERVE" on initial
+[33m│[0m [0mresource creation. Use "resolve_conflicts_on_create" and/or
+[33m│[0m [0m"resolve_conflicts_on_update" instead
+[33m│[0m [0m
+[33m│[0m [0m(and 6 more similar warnings elsewhere)
+[33m╵[0m[0m
+[31m╷[0m[0m
+[31m│[0m [0m[1m[31mError: [0m[0m[1mUnauthorized[0m
+[31m│[0m [0m
+[31m│[0m [0m[0m  with kubernetes_cluster_role.test[0],
+[31m│[0m [0m  on test.tf line 18, in resource "kubernetes_cluster_role" "test":
+[31m│[0m [0m  18: resource "kubernetes_cluster_role" "test" [4m{[0m[0m
+[31m│[0m [0m
+[31m╵[0m[0m
+[31m╷[0m[0m
+[31m│[0m [0m[1m[31mError: [0m[0m[1mUnauthorized[0m
+[31m│[0m [0m
+[31m│[0m [0m[0m  with kubernetes_cluster_role.global_read_access[0],
+[31m│[0m [0m  on test.tf line 35, in resource "kubernetes_cluster_role" "global_read_access":
+[31m│[0m [0m  35: resource "kubernetes_cluster_role" "global_read_access" [4m{[0m[0m
+[31m│[0m [0m
+[31m╵[0m[0m
+[31m╷[0m[0m
+::debug::Terraform exited with code 1.
+::debug::stdout: [0m[1mrandom_pet.test: Refreshing state... [id=test][0m%0A[0m[1mdata.github_team.owner: Reading...[0m[0m%0A[0m[33m╵[0m[0m%0A
+::debug::stderr: [31m╷[0m[0m%0A[31m│[0m [0m[1m[31mError: [0m[0m[1mUnauthorized[0m%0A[31m│[0m [0m%0A[31m│[0m [0m[0m  with kubernetes_cluster_role.test[0],%0A[31m│[0m [0m  on test.tf line 18, in resource "kubernetes_cluster_role" "test":%0A[31m│[0m [0m  18: resource "kubernetes_cluster_role" "test" [4m{[0m[0m%0A[31m│[0m [0m%0A[31m╵[0m[0m%0A[31m╷[0m[0m%0A[31m│[0m [0m[1m[31m[0m[0m%0A
+::debug::exitcode: 1
+::error::Terraform exited with code 1.

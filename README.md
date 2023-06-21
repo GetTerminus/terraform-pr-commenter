@@ -1,10 +1,11 @@
 # Terraform PR Commenter
 
-Adds opinionated comments to PR's based on Terraform `fmt`, `init`, `plan` and `validate` outputs.
+> This project was forked from <https://github.com/robburger/terraform-pr-commenter> project, originally created by [
+Rob Burger](https://github.com/robburger).
 
 ## Summary
 
-This Docker-based GitHub Action is designed to work in tandem with [hashicorp/setup-terraform](https://github.com/hashicorp/setup-terraform) with the **wrapper enabled**, taking the output from a `fmt`, `init`, `plan` or `validate`, formatting it and adding it to a pull request. Any previous comments from this Action are removed to keep the PR timeline clean.
+This Docker-based GitHub Action is designed to work in tandem with [hashicorp/setup-terraform](https://github.com/hashicorp/setup-terraform) with the **wrapper enabled**, taking the output from a `fmt`, `init`, `plan`, `validate` or `tflint`, formatting it and adding it to a pull request. Any previous comments from this Action are removed to keep the PR timeline clean.
 
 > The `terraform_wrapper` needs to be set to `true` (which is already the default) for the `hashicorp/setup-terraform` step as it enables the capturing of `stdout`, `stderr` and the `exitcode`.
 
@@ -12,16 +13,20 @@ Support (for now) is [limited to Linux](https://help.github.com/en/actions/creat
 
 ## Usage
 
-This action can only be run after a Terraform `fmt`, `init`, `plan` or `validate` has completed, and the output has been captured. Terraform rarely writes to `stdout` and `stderr` in the same action, so we concatenate the `commenter_input`:
+This action can only be run after a Terraform `fmt`, `init`, `plan`, `validate` or `tflint` has completed, and the output has been captured. Terraform rarely writes to `stdout` and `stderr` in the same action, so we concatenate the `commenter_input`:
 
 ```yaml
-- uses: robburger/terraform-pr-commenter@v1
+- uses: GetTerminus/terraform-pr-commenter@v2
   env:
     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    TF_WORKSPACE: ${{ inputs.terraform_workspace }}
   with:
-    commenter_type: fmt/init/plan/validate # Choose one
-    commenter_input: ${{ format('{0}{1}', steps.step_id.outputs.stdout, steps.step_id.outputs.stderr) }}
-    commenter_exitcode: ${{ steps.step_id.outputs.exitcode }}
+    commenter_type: plan
+    commenter_input: ${{ env.PLAN_OUTPUT }}
+    commenter_plan_path: tfplan
+    commenter_exitcode: ${{ steps.plan.outputs.exit }}
+    terraform_version: ${{ inputs.terraform_version }}
+    use_beta_version: ${{ inputs.use_beta_commenter }}
 ```
 
 ### Inputs

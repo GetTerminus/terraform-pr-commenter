@@ -1,0 +1,27 @@
+[command]/home/runner/work/_temp/1ae545d0-53d7-4d7f-87ed-ec0b0d7a74e4/terraform-bin validate
+[33m╷[0m[0m
+[33m│[0m [0m[1m[33mWarning: [0m[0m[1mArgument is deprecated[0m
+[33m│[0m [0m
+[33m│[0m [0m[0m  with module.test_vpc.aws_eip.nat,
+[33m│[0m [0m  on modules/vpc/test.tf line 846, in resource "aws_eip" "nat":
+[33m│[0m [0m 846:   vpc = [4mtrue[0m[0m
+[33m│[0m [0m
+[33m│[0m [0muse domain attribute instead
+[33m╵[0m[0m
+[31m╷[0m[0m
+[31m│[0m [0m[1m[31mError: [0m[0m[1mMissing resource instance key[0m
+[31m│[0m [0m
+[31m│[0m [0m[0m  on test.tf line 163, in module "test":
+[31m│[0m [0m 163:         [4maws_security_group.test[0m.id,[0m
+[31m│[0m [0m
+[31m│[0m [0mBecause aws_security_group.test has "count" set, its
+[31m│[0m [0mattributes must be accessed on specific instances.
+[31m│[0m [0m
+[31m│[0m [0mFor example, to correlate with indices of a referring resource, use:
+[31m│[0m [0m    aws_security_group.test[count.index]
+[31m╵[0m[0m
+::debug::Terraform exited with code 1.
+::debug::stdout: [33m╷[0m[0m%0A[33m│[0m [0m[1m[33mtest%0A[33m╵[0m[0m%0A
+::debug::stderr: [31m╷[0m[0m%0A[31m│[0m [0m[1m[31mtest%0A[31m╵[0m[0m%0A
+::debug::exitcode: 1
+::error::Terraform exited with code 1.
