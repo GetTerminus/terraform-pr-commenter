@@ -36,7 +36,7 @@ plan_fail () {
   # shellcheck disable=SC2034
   start_delimiter=$(start_delimiter_builder "${start_delimiter_strings[@]}")
 
-  clean_input=$(echo "$INPUT" | perl -pe'${delimiter}')
+  clean_input=$(echo "$INPUT" | perl -pe'${start_delimiter}')
 
   post_diff_comments "plan" "Terraform \`plan\` Failed for Workspace: \`$WORKSPACE\`" "$clean_input"
 }
@@ -55,9 +55,6 @@ post_plan_comments () {
   # shellcheck disable=SC2034
   start_delimiter=$(start_delimiter_builder "${start_delimiter_strings[@]}")
   end_delimiter=$(end_delimiter_builder "/Plan: ")
-
-  debug "Delimiter Test"
-  echo "${start_delimiter}"
 
   clean_input=$(echo "$INPUT" | perl -pe'$start_delimiter')
   clean_input=$(echo "$clean_input" | sed -r "${end_delimiter}")
