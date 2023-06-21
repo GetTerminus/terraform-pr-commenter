@@ -36,7 +36,7 @@ plan_fail () {
   # shellcheck disable=SC2034
   start_delimiter=$(start_delimiter_builder "${start_delimiter_strings[@]}")
 
-  clean_input=$(echo "$INPUT" | perl -pe'${start_delimiter}')
+  clean_input=$(echo "$INPUT" | perl -pe'$start_delimiter')
 
   post_diff_comments "plan" "Terraform \`plan\` Failed for Workspace: \`$WORKSPACE\`" "$clean_input"
 }
@@ -56,6 +56,7 @@ post_plan_comments () {
   start_delimiter=$(start_delimiter_builder "${start_delimiter_strings[@]}")
   end_delimiter=$(end_delimiter_builder "/Plan: ")
 
+  #clean_input=$(echo "$INPUT" | perl -pe'$_="" unless /(An execution plan has been generated and is shown below.|Terraform used the selected providers to generate the following execution|No changes. Infrastructure is up-to-date.|No changes. Your infrastructure matches the configuration.)/ .. 1')
   clean_input=$(echo "$INPUT" | perl -pe'$start_delimiter')
   clean_input=$(echo "$clean_input" | sed -r "${end_delimiter}")
 
