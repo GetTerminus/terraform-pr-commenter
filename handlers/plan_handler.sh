@@ -54,7 +54,7 @@ plan_fail () {
   debug "Test Delimiter"
   echo "$delimiter"
 
-  clean_input=$(echo "$INPUT" | perl -pe$delimiter)
+  clean_input=$(echo "$INPUT" | perl -pe'$delimiter')
   comment=$(make_details_with_header "Terraform \`plan\` Failed for Workspace: \`$WORKSPACE\`" "$clean_input" "diff")
 
   # Add comment to PR.
