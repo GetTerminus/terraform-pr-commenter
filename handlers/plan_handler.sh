@@ -33,7 +33,7 @@ plan_fail () {
   delimiters+="Planning failed. Terraform encountered an error while generating this plan."
   delimiters+="Terraform planned the following actions, but then encountered a problem:"
 
-  debug "Test Delimiter"
+  debug "Test Delimiter
 
   delimiter_builder "${delimiters[@]}"
 
