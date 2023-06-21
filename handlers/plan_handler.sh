@@ -52,7 +52,7 @@ plan_fail () {
   local delimiter=$(delimiter_builder "${delimiter_strings[@]}")
 
   debug "Test Delimiter"
-  echo "$delimiter"
+  echo "\'$delimiter\'"
 
   clean_input=$(echo "$INPUT" | perl -pe'$delimiter')
   comment=$(make_details_with_header "Terraform \`plan\` Failed for Workspace: \`$WORKSPACE\`" "$clean_input" "diff")
