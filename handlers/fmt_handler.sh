@@ -33,21 +33,9 @@ fmt_fail () {
   # Exit Code: 3
   # Meaning: One or more files are incorrectly formatted.
   # Actions: Iterate over all files and build diff-based PR comment.
-
   if [[ $EXIT_CODE -eq 3 ]]; then
     pr_comment=$(make_details_with_header "Terraform \`fmt\` Failed" "$INPUT" "diff")
   fi
-#  if [[ $EXIT_CODE -eq 3 ]]; then
-#    local all_files_diff=""
-#    for file in $INPUT; do
-#      local this_file_diff=$(terraform fmt -no-color -write=false -diff "$file")
-#      all_files_diff="$all_files_diff
-#$(make_details "<code>$file</code>" "$this_file_diff" "diff")"
-#    done
-#
-#    pr_comment="### Terraform \`fmt\` Failed
-#$all_files_diff"
-#  fi
 
   # Add fmt failure comment to PR.
   make_and_post_payload "fmt failure" "$pr_comment"

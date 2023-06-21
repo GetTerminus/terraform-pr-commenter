@@ -76,9 +76,6 @@ post_outputs_comments() {
   delimiter_start_cmd=$(delimiter_start_cmd_builder "${delimiter_start_strings[@]}")
   delimiter_end_cmd=$(delimiter_end_cmd_builder "------------------------------------------------------------------------")
 
-  #clean_input=$(echo "$INPUT" | perl -pe'$_="" unless /Changes to Outputs:/ .. 1') # Skip to end of plan summary
-  #clean_input=$(echo "$clean_input" | sed -r '/------------------------------------------------------------------------/q') # Ignore everything after plan summary
-
   debug "delimiter_start_cmd: $delimiter_start_cmd"
   debug "delimiter_end_cmd: $delimiter_end_cmd"
 

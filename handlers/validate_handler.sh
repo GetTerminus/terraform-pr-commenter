@@ -21,6 +21,9 @@ validate_success () {
 }
 
 validate_fail () {
-  local pr_comment=$(make_details_with_header "Terraform \`validate\` Failed" "$INPUT" "diff")
+  local pr_comment
+
+  pr_comment=$(make_details_with_header "Terraform \`validate\` Failed" "$INPUT" "diff")
+
   make_and_post_payload "validate failure" "$pr_comment"
 }
