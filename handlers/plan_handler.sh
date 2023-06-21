@@ -30,13 +30,13 @@ plan_fail () {
   local start_delimiter_strings=()
   local start_delimiter
 
-  start_delimiter_strings+=("Planning failed. Terraform encountered an error while generating this plan.")
-  start_delimiter_strings+=("Terraform planned the following actions, but then encountered a problem:")
+  start_delimiter_strings+="Planning failed. Terraform encountered an error while generating this plan."
+  start_delimiter_strings+="Terraform planned the following actions, but then encountered a problem:"
 
   # shellcheck disable=SC2034
   start_delimiter=$(start_delimiter_builder "${start_delimiter_strings[@]}")
 
-  clean_input=$(echo "$INPUT" | perl -pe'$start_delimiter')
+  clean_input=$(echo "$INPUT" | perl -pe'${start_delimiter}')
 
   post_diff_comments "plan" "Terraform \`plan\` Failed for Workspace: \`$WORKSPACE\`" "$clean_input"
 }
