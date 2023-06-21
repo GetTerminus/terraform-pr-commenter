@@ -26,8 +26,10 @@ jobs:
       tf_plan_fail_partial: ${{ steps.file_outputs.outputs.tf_plan_fail_partial }}
       tf_plan_success_no_changes: ${{ steps.file_outputs.outputs.tf_plan_success_no_changes }}
       tf_plan_success_with_changes: ${{ steps.file_outputs.outputs.tf_plan_success_with_changes }}
+      tf_plan_success_with_outputs: ${{ steps.file_outputs.outputs.tf_plan_success_with_outputs }}
       tf_plan_success_long: ${{ steps.file_outputs.outputs.tf_plan_success_long }}
       tf_validate_fail: ${{ steps.file_outputs.outputs.tf_validate_fail }}
+      tflint_fail: ${{ steps.file_outputs.outputs.tflint_fail }}
     strategy:
       matrix:
         filenames:
