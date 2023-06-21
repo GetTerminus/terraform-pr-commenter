@@ -1,6 +1,6 @@
 execute_tflint () {
   # shellcheck disable=SC2016
-  delete_existing_comments 'tflint' '### Linter `tflint` .* for Workspace: `'"$WORKSPACE"'`.*'
+  delete_existing_comments 'tflint' '### Linter `TFLint` .* for Workspace: `'"$WORKSPACE"'`.*'
 
   # Exit Code: 0
   # Meaning: TFLint found 0 issues.
