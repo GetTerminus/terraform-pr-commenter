@@ -132,26 +132,26 @@ delimiter_builder () {
   printf '$_="" unless /(%s)/ .. 1' "$delimiter_string"
 }
 
-print_array ()
-{
-  # run through array and print each entry:
-  local array
-  array=("$@")
-  for i in "${array[@]}" ; do
-      printf '%s|' "$i"
-  done
-}
+#print_array ()
+#{
+#  # run through array and print each entry:
+#  local array
+#  array=("$@")
+#  for i in "${array[@]}" ; do
+#      printf '%s|' "$i"
+#  done
+#}
 
 end_delimiter_builder () {
   printf "%s/q" "$1"
 }
 
-#print_array ()
-#{
-#  # run through array and print each entry:
-#  local array
-#  local delimiter_string
-#  array=("$@")
-#  delimiter_string=$(IFS="|" ; echo "${array[*]}")
-#  echo "$delimiter_string"
-#}
+print_array ()
+{
+  # run through array and print each entry:
+  local array
+  local delimiter_string
+  array=("$@")
+  delimiter_string=$(IFS="|" ; echo "${array[*]}")
+  echo "$delimiter_string"
+}
