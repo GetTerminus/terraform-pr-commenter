@@ -62,9 +62,7 @@ jobs:
     needs: set-outputs
     steps:
       - uses: actions/checkout@v3
-        if: ${{ env.TEST_INPUT_TYPE == 'file' }}
       - name: TF Plan File - tf_plan_fail
-        if: ${{ env.TEST_INPUT_TYPE == 'file' }}
         uses: GetTerminus/terraform-pr-commenter@v3-beta
         with:
           commenter_type: plan
