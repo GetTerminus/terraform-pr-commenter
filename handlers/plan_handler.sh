@@ -46,8 +46,8 @@ plan_fail () {
   local comment
   local delimiter_strings=()
 
-  delimiter_strings+="Planning failed. Terraform encountered an error while generating this plan."
-  delimiter_strings+="Terraform planned the following actions, but then encountered a problem:"
+  delimiter_strings+=("Planning failed. Terraform encountered an error while generating this plan.")
+  delimiter_strings+=("Terraform planned the following actions, but then encountered a problem:")
 
   local delimiter=$(print_array "${delimiter_strings[@]}")
 
