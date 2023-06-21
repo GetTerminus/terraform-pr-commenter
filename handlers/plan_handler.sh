@@ -25,19 +25,40 @@ plan_success () {
   fi
 }
 
+#plan_fail () {
+#  local clean_input
+#  local start_delimiter_strings=()
+#  local start_delimiter
+#
+#  start_delimiter_strings+="Planning failed. Terraform encountered an error while generating this plan."
+#  start_delimiter_strings+="Terraform planned the following actions, but then encountered a problem:"
+#
+#  # shellcheck disable=SC2034
+#  start_delimiter=$(start_delimiter_builder "${start_delimiter_strings[@]}")
+#
+#  clean_input=$(echo "$INPUT" | perl -pe'${start_delimiter}')
+#
+#  post_diff_comments "plan" "Terraform \`plan\` Failed for Workspace: \`$WORKSPACE\`" "$clean_input"
+#}
+
 plan_fail () {
   local clean_input
-  local start_delimiter_strings=()
-  local start_delimiter
+  local comment
+  local delimiter_strings=()
 
-  start_delimiter_strings+="Planning failed. Terraform encountered an error while generating this plan."
-  start_delimiter_strings+="Terraform planned the following actions, but then encountered a problem:"
+  delimiter_strings+="Planning failed. Terraform encountered an error while generating this plan."
+  delimiter_strings+="Terraform planned the following actions, but then encountered a problem:"
 
-  # shellcheck disable=SC2034
-  start_delimiter=$(start_delimiter_builder "${start_delimiter_strings[@]}")
+  debug "Test Delimiter"
 
-  clean_input=$(echo "$INPUT" | perl -pe'${start_delimiter}')
 
+  local delimiter=$(delimiter_builder "${delimiter_strings[@]}")
+
+  clean_input=$(echo "$INPUT" | perl -pe'$delimiter')
+  comment=$(make_details_with_header "Terraform \`plan\` Failed for Workspace: \`$WORKSPACE\`" "$clean_input" "diff")
+
+  # Add comment to PR.
+  #make_and_post_payload "plan failure" "$comment"
   post_diff_comments "plan" "Terraform \`plan\` Failed for Workspace: \`$WORKSPACE\`" "$clean_input"
 }
 
