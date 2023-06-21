@@ -43,24 +43,21 @@ plan_success () {
 
 plan_fail () {
   local clean_input
-  local comment
-  local delimiter_strings=()
+  local start_delimiter_strings=()
+  local delimiter_start_cmd
 
-  delimiter_strings+=("Planning failed. Terraform encountered an error while generating this plan.")
-  delimiter_strings+=("Terraform planned the following actions, but then encountered a problem:")
+  start_delimiter_strings+=("Planning failed. Terraform encountered an error while generating this plan.")
+  start_delimiter_strings+=("Terraform planned the following actions, but then encountered a problem:")
 
-  local delimiter=$(delimiter_builder "${delimiter_strings[@]}")
+  delimiter_start_cmd=$(delimiter_start_cmd_builder "${start_delimiter_strings[@]}")
 
   debug "Test Delimiter"
-  echo "$delimiter"
+  echo "$delimiter_start_cmd"
 
   #clean_input=$(echo "$INPUT" | perl -pe'$_="" unless /(Planning failed. Terraform encountered an error while generating this plan.|Terraform planned the following actions, but then encountered a problem:)/ .. 1')
   #clean_input=$(echo "$INPUT" | perl -pe'$delimiter')
-  clean_input=$(echo "$INPUT" | perl -pe "${delimiter}")
-  comment=$(make_details_with_header "Terraform \`plan\` Failed for Workspace: \`$WORKSPACE\`" "$clean_input" "diff")
+  clean_input=$(echo "$INPUT" | perl -pe "${delimiter_start_cmd}")
 
-  # Add comment to PR.
-  #make_and_post_payload "plan failure" "$comment"
   post_diff_comments "plan" "Terraform \`plan\` Failed for Workspace: \`$WORKSPACE\`" "$clean_input"
 }
 

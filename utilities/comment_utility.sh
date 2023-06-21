@@ -127,13 +127,16 @@ color_red () {
   echo "\033[31;1m$1\033[0m"
 }
 
-delimiter_builder () {
-  local delimiter_string=$(print_array "$@")
-  delimiter_string=${delimiter_string::-1}
+delimiter_start_cmd_builder () {
+  local delimiter_string
+
+  delimiter_string=$(print_start_delimiter_string "$@")
+  delimiter_string=${delimiter_string::-1} #Get rid of trailing `|`
+
   printf "\$_=\"\" unless /(%s)/ .. 1" "$delimiter_string"
 }
 
-print_array ()
+print_start_delimiter_string ()
 {
   # run through array and print each entry:
   local array
@@ -143,16 +146,6 @@ print_array ()
   done
 }
 
-end_delimiter_builder () {
+print_end_delimiter_string () {
   printf "%s/q" "$1"
 }
-
-#print_array ()
-#{
-#  # run through array and print each entry:
-#  local array
-#  local delimiter_string
-#  array=("$@")
-#  delimiter_string=$(IFS="|" ; echo "${array[*]}")
-#  echo "$delimiter_string"
-#}
