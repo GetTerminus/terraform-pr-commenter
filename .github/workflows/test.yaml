@@ -57,12 +57,12 @@ jobs:
 
   # To test other scenarios please change the below variables as necessary.
   commenter-test:
-    name: Plan File Tests
+    name: Test Commenter
     runs-on: ubuntu-latest
     needs: set-outputs
     steps:
       - uses: actions/checkout@v3
-      - name: TF Plan File - tf_plan_fail
+      - name: Test
         uses: GetTerminus/terraform-pr-commenter@v3-beta
         with:
           commenter_type: plan
