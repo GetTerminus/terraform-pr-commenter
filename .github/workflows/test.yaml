@@ -1,7 +1,12 @@
 name: Test
 
 on:
-  pull_request:
+  workflow_run:
+    workflows: ["Release Beta"]
+    branches-ignore:
+      - master
+    types:
+      - completed
 
 env:
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

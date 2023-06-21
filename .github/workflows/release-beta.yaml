@@ -1,7 +1,7 @@
 name: Release Beta
 
 on:
-  push:
+  pull-request:
     branches-ignore:
       - master
 
