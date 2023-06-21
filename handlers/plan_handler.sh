@@ -54,6 +54,11 @@ post_plan_comments () {
   delimiter_start_cmd=$(delimiter_start_cmd_builder "${start_delimiter_strings[@]}")
   delimiter_end_cmd=$(delimiter_end_cmd_builder "Plan: ")
 
+  debug "DELIMIT START"
+  echo "$delimiter_start_cmd"
+  debug "DELIMIT END"
+  echo "$delimiter_end_cmd"
+
   #clean_input=$(echo "$INPUT" | perl -pe'$_="" unless /(An execution plan has been generated and is shown below.|Terraform used the selected providers to generate the following execution|No changes. Infrastructure is up-to-date.|No changes. Your infrastructure matches the configuration.)/ .. 1')
   clean_input=$(echo "$INPUT" | perl -pe "${delimiter_start_cmd}")
   clean_input=$(echo "$clean_input" | sed -r "${delimiter_end_cmd}")
