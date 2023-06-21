@@ -141,8 +141,8 @@ print_array ()
 {
   # run through array and print each entry:
   local array
+  local delimiter_string
   array=("$@")
-  for i in "${array[@]}" ; do
-      printf '%s|' "$i"
-  done
+  delimiter_string=$(IFS="|" ; echo "${array[*]}")
+  echo "$delimiter_string"
 }
