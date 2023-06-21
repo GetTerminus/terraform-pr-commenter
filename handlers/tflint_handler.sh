@@ -24,7 +24,7 @@ tflint_success () {
 tflint_fail () {
   local pr_comment
 
-  pr_comment=$(make_details_with_header "Linter \`TFLint\` Failed" "$INPUT")
+  pr_comment=$(make_details_with_header "Linter \`TFLint\` Failed for Workspace: \`$WORKSPACE\`" "$INPUT")
 
   make_and_post_payload "tflint failure" "$pr_comment"
 }
