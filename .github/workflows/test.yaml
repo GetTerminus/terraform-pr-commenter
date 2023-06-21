@@ -3,8 +3,6 @@ name: Test
 on:
   workflow_run:
     workflows: ["Release Beta"]
-    branches-ignore:
-      - master
     types:
       - completed
 
