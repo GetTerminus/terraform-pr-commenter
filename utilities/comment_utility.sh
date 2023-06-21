@@ -126,3 +126,18 @@ color_yellow () {
 color_red () {
   echo "\033[31;1m$1\033[0m"
 }
+
+delimiter_builder () {
+  local delimiter_string=$(print_array "$@")
+  printf '$_="" unless /(%s)/ .. 1' "$delimiter_string"
+}
+
+print_array ()
+{
+  # run through array and print each entry:
+  local array
+  array=("$@")
+  for i in "${array[@]}" ; do
+      printf '%s|' "$i"
+  done
+}
