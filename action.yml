@@ -17,10 +17,6 @@ inputs:
   commenter_exitcode:
     description: 'The exit code from a previous step output'
     required: true
-  terraform_version:
-    description: 'The version of terraform with which a plan was generated'
-    required: false
-    default: "1.4.6"
   use_beta_version:
     description: 'Whether to use the beta version of the commenter'
     required: false
@@ -30,12 +26,12 @@ runs:
   steps:
     - name: Build Commenter Docker Image (master)
       if: ${{ inputs.use_beta_version != 'true' }}
-      run: docker build --build-arg TERRAFORM_VERSION=${{ inputs.terraform_version }} -t commenter https://github.com/GetTerminus/terraform-pr-commenter.git#master
+      run: docker build -t commenter https://github.com/GetTerminus/terraform-pr-commenter.git#master
       shell: bash
     - name: Build Commenter Docker Image (beta)
       if: ${{ inputs.use_beta_version == 'true' }}
       # append branch with a pound (#) if developing.  e.g., `commenter.git#my-branch`
-      run: docker build --build-arg TERRAFORM_VERSION=${{ inputs.terraform_version }} -t commenter https://github.com/GetTerminus/terraform-pr-commenter.git#dpr-update-commenter
+      run: docker build -t commenter https://github.com/GetTerminus/terraform-pr-commenter.git#dpr-update-commenter
       shell: bash
     - name: Run commenter image (plan)
       if: ${{ inputs.commenter_type == 'plan' }}
@@ -43,7 +39,6 @@ runs:
         COMMENTER_INPUT: ${{ inputs.commenter_input }}
         COMMENTER_PLAN_FILE: ${{ inputs.commenter_plan_path }}
         GITHUB_EVENT: ${{ toJSON(github.event) }}
-        AWS_SECRET_ACCESS_KEY: ${{ env.AWS_SECRET_KEY }}
       run: |
         docker run \
         -e GITHUB_TOKEN \
@@ -52,10 +47,6 @@ runs:
         -e HIGHLIGHT_CHANGES \
         -e GITHUB_EVENT \
         -e COMMENTER_INPUT \
-        -e AWS_ACCESS_KEY_ID \
-        -e AWS_SECRET_KEY \
-        -e AWS_SECRET_ACCESS_KEY \
-        -e AWS_REGION \
         -e COMMENTER_DEBUG \
         -e COMMENTER_ECHO \
         -e COMMENTER_PLAN_FILE \

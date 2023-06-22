@@ -79,5 +79,4 @@ jobs:
           commenter_input: ${{ needs.set-outputs.outputs.tf_fmt_fail }}
           #commenter_plan_path: ./testing/text-files/tflint_fail.txt
           commenter_exitcode: 3
-          terraform_version: ${{ env.TERRAFORM_VERSION }}
           use_beta_version: ${{ env.USE_BETA_VERSION }}

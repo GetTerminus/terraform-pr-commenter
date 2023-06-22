@@ -1,5 +1,4 @@
-ARG TERRAFORM_VERSION=1.4.6
-FROM hashicorp/terraform:${TERRAFORM_VERSION}
+FROM hashicorp/terraform:1.4.6
 
 LABEL repository="https://github.com/GetTerminus/terraform-pr-commenter" \
       homepage="https://github.com/GetTerminus/terraform-pr-commenter" \
