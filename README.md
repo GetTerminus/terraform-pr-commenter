@@ -103,13 +103,14 @@ jobs:
 
 ### Inputs
 
-| Name                  | Requirement    | Description                                                                                                                             |
-|-----------------------|----------------|-----------------------------------------------------------------------------------------------------------------------------------------|
-| `commenter_type`      | ___required___ | The type of comment. Options: [`fmt`, `init`, `plan`, `validate`, `tflint`]                                                             |
-| `commenter_input`     | ___optional___ | The comment to post from a previous step output. For plan commenter type either `commenter_input` or `commenter_plan_path` must be set. |
-| `commenter_plan_path` | ___optional___ | The plan file path including the filename. Only available for plan commenter types.                                                     |
-| `commenter_exitcode`  | ___required___ | The exit code from a previous step output.                                                                                              |
-| `use_beta_version`    | ___optional___ | Whether or not to use the beta version of the commenter.                                                                                |
+| Name                  | Requirement    | Description                                                                                                                                                         |
+|-----------------------|----------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `commenter_type`      | ___required___ | The type of comment. Options: [`fmt`, `init`, `plan`, `validate`, `tflint`]                                                                                         |
+| `commenter_input`     | ___optional___ | The comment to post from a previous step output. For plan commenter type either `commenter_input` or `commenter_plan_path` must be set. _This is limited to 128KiB_ |
+| `commenter_plan_path` | ___optional___ | The plan file path including the filename. Only available for plan commenter types.                                                                                 |
+| `commenter_exitcode`  | ___required___ | The exit code from a previous step output.                                                                                                                          |
+| `terraform_version`   | ___optional___ | The version of terraform from the workflow. Defaults to `1.4.6`.                                                                                                    |
+| `use_beta_version`    | ___optional___ | Whether or not to use the beta version of the commenter.                                                                                                            |
 
 ### Environment Variables
 
@@ -121,12 +122,39 @@ jobs:
 | `HIGHLIGHT_CHANGES`      | ___optional___ | Default: `true`. This switches `~` to `!` in `plan` diffs to highlight Terraform changes in orange. Set to `false` to disable.                            |
 | `COMMENTER_DEBUG`        | ___optional___ | Default: `false`. This switches the commenter into debug mode.                                                                                            |
 
-All of these environment variables can be set at `job` or `step` level. For example, you could collapse all outputs but expand on a `plan`:
-
 ## Notes
 
 * The commenter requires a pull request to run so the github event must contain a `.pull_request.number`.
-* For large terraform plans using stdout/stder, there is a limit to the size of the `commenter_input` (approx 130000 characters). If your output is larger than that you will need to either truncate or switch the output to a text file as shown in the workflow example above.
+* For large terraform plans using stdout/stder, there is aproximately  128KiB limit to the size of the `commenter_input`. If your output is larger than that you will need to either truncate or switch the output to a text file as shown in the workflow example above. An example of how to truncate the plan output is shown below.
+
+Example TF Plan Truncate:
+
+```yaml
+- name: TF Plan - Truncate
+  id: plan
+  # have to use /bin/bash because GHA runs by default with `set -e` to end execution on any error.
+  # we want to capture the error instead.
+  shell: '/bin/bash {0}'
+  run: |
+    # copy the stdout file handle to fd5.
+    exec 5>&1
+
+    # merge stderr into stdout and print it to fd5 (parent shell's stdout); exit with the code from terraform plan
+    OUTPUT=$(terraform plan -lock=false -input=false 2>&1 | tee /dev/fd/5; exit ${PIPESTATUS[0]})
+
+    # store the exit code here
+    EXITCODE=$?
+
+    # github actions doesn't allow us to set a multiline output so we export it to the environment
+    EOF=$(dd if=/dev/urandom bs=15 count=1 status=none | base64)
+    echo "PLAN_OUTPUT<<$EOF" >> $GITHUB_OUTPUT
+    echo "${OUTPUT::128000}" >> $GITHUB_OUTPUT
+    echo "$EOF" >> $GITHUB_OUTPUT
+
+    # set exit code for pickup later, and make sure we exit with same code
+    echo "exitcode=$EXITCODE" >> $GITHUB_OUTPUT
+    exit $EXITCODE
+```
 
 ## Screenshots
 

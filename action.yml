@@ -1,5 +1,5 @@
 name: 'Terraform PR Commenter'
-description: 'Adds opinionated comments to a PR from Terraform fmt/init/plan output'
+description: 'Adds opinionated comments to a PR from Terraform fmt/init/plan/validate/tflint output'
 author: 'Rob Burger'
 branding:
   icon: 'git-pull-request'
@@ -9,7 +9,7 @@ inputs:
     description: 'The type of comment. Options: [fmt, init, plan, validate, tflint]'
     required: true
   commenter_input:
-    description: 'The comment to post from a previous step output. Required for non plan commenter types.'
+    description: 'The comment to post from a previous step output. This must be trimmed to at least 128 KiB. Required for non plan commenter types.'
     required: false
   commenter_plan_path:
     description: 'The tfplan file. Required if commenter input is not set for plan commenter types.'
@@ -17,6 +17,10 @@ inputs:
   commenter_exitcode:
     description: 'The exit code from a previous step output'
     required: true
+  terraform_version:
+    description: 'The version of terraform from the workflow.'
+    required: false
+    default: "1.4.6"
   use_beta_version:
     description: 'Whether to use the beta version of the commenter'
     required: false
@@ -24,14 +28,14 @@ inputs:
 runs:
   using: "composite"
   steps:
-    - name: Build Commenter Docker Image (master)
+    - name: Build commenter docker image (master)
       if: ${{ inputs.use_beta_version != 'true' }}
-      run: docker build -t commenter https://github.com/GetTerminus/terraform-pr-commenter.git#master
+      run: docker build --build-arg TERRAFORM_VERSION=${{ inputs.terraform_version }} -t commenter https://github.com/GetTerminus/terraform-pr-commenter.git#master
       shell: bash
-    - name: Build Commenter Docker Image (beta)
+    - name: Build commenter docker image (beta)
       if: ${{ inputs.use_beta_version == 'true' }}
       # append branch with a pound (#) if developing.  e.g., `commenter.git#my-branch`
-      run: docker build -t commenter https://github.com/GetTerminus/terraform-pr-commenter.git#v3-beta
+      run: docker build --build-arg TERRAFORM_VERSION=${{ inputs.terraform_version }} -t commenter https://github.com/GetTerminus/terraform-pr-commenter.git#v3-beta
       shell: bash
     - name: Run commenter image (plan)
       if: ${{ inputs.commenter_type == 'plan' }}
