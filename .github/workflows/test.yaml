@@ -61,7 +61,7 @@ jobs:
           echo "$(cat ./testing/text-files/${{ matrix.filenames }}.txt)" >> $GITHUB_OUTPUT
           echo "$EOF" >> $GITHUB_OUTPUT
 
-  # To test other scenarios please change the below variables as necessary.
+  # To test other scenarios please change the below variables as necessary
   commenter-test:
     name: Test Commenter
     runs-on: ubuntu-latest
