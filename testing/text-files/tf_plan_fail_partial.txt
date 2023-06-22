@@ -1,0 +1,153 @@
+[command]/home/runner/work/_temp/99227165-25f1-4d41-a47a-e8aaf3591c9d/terraform-bin plan -var-file=vars/test.tfvars -var-file=vars/test-vpc.tfvars -var-file=vars/test.tfvars -lock=false -input=false
+[0m[1mrandom_pet.test: Refreshing state... [id=test][0m
+[0m[1mdata.github_team.owner: Reading...[0m[0m
+[0m[1mdata.aws_caller_identity.test: Reading...[0m[0m
+[0m[1mdata.aws_caller_identity.test: Read complete after 1s [id=test_account][0m
+[0m[1mmodule.test_vpc.data.aws_vpc_endpoint_service.s3[0]: Reading...[0m[0m
+[0m[1mmodule.test[0].data.aws_caller_identity.current: Reading...[0m[0m
+[0m[1mmodule.test[0].module.kms.data.aws_partition.current: Reading...[0m[0m
+[0m[1mmodule.test[0].module.kms.data.aws_caller_identity.current: Reading...[0m[0m
+[0m[1mdata.aws_iam_policy_document.test_admin_arp: Reading...[0m[0m
+[0m[1maws_secretsmanager_secret.artifactory[0]: Refreshing state... [id=arn:aws:secretsmanager:test_region:test_account_2:secret:test_secret_3][0m
+[0m[1mdata.aws_iam_policy_document.test_admin_policy_doc: Reading...[0m[0m
+[0m[1maws_secretsmanager_secret.github_app_pem_file[0]: Refreshing state... [id=arn:aws:secretsmanager:test_region:test_account_2:secret:test_secret_2][0m
+[0m[1maws_secretsmanager_secret.gh_ssh_key[0]: Refreshing state... [id=arn:aws:secretsmanager:test_region:test_account_2:secret:test][0m
+[0m[1mmodule.test[0].module.kms.data.aws_partition.current: Read complete after 0s [id=aws][0m
+[0m[1mdata.aws_iam_policy_document.test_admin_policy_doc: Read complete after 0s [id=test_id][0m
+[0m[1mdata.aws_iam_policy_document.test_admin_arp: Read complete after 0s [id=test_id][0m
+[0m[1mdata.aws_test_cluster.selected: Reading...[0m[0m
+[0m[1mdata.aws_region.current: Reading...[0m[0m
+[0m[1maws_secretsmanager_secret.pagerduty_api_token[0]: Refreshing state... [id=arn:aws:secretsmanager:test_region:test_account_2:secret:pagerduty-api-token-bRH21U][0m
+[0m[1mdata.aws_region.current: Read complete after 0s [id=test_region][0m
+
+Terraform used the selected providers to generate the following execution
+plan. Resource actions are indicated with the following symbols:
+  [32m+[0m create[0m
+  [31m-[0m destroy[0m
+
+Terraform planned the following actions, but then encountered a problem:
+
+[1m  # module.test_vpc.aws_eip.nat[3][0m will be created
+[0m  [32m+[0m[0m resource "aws_eip" "nat" {
+      [32m+[0m[0m allocation_id        = (known after apply)
+      [32m+[0m[0m association_id       = (known after apply)
+      [32m+[0m[0m carrier_ip           = (known after apply)
+      [32m+[0m[0m customer_owned_ip    = (known after apply)
+      [32m+[0m[0m domain               = (known after apply)
+      [32m+[0m[0m id                   = (known after apply)
+      [32m+[0m[0m instance             = (known after apply)
+      [32m+[0m[0m network_border_group = (known after apply)
+      [32m+[0m[0m network_interface    = (known after apply)
+      [32m+[0m[0m private_dns          = (known after apply)
+      [32m+[0m[0m private_ip           = (known after apply)
+      [32m+[0m[0m public_dns           = (known after apply)
+      [32m+[0m[0m public_ip            = (known after apply)
+      [32m+[0m[0m public_ipv4_pool     = (known after apply)
+      [32m+[0m[0m tags                 = {
+          [32m+[0m[0m "Environment" = "test"
+        }
+      [32m+[0m[0m tags_all             = {
+          [32m+[0m[0m "Environment" = "test"
+        }
+      [32m+[0m[0m vpc                  = true
+    }
+
+[1m  # module.test_vpc.aws_route_table.private[3][0m will be created
+[0m  [32m+[0m[0m resource "aws_route_table" "private" {
+      [32m+[0m[0m arn              = (known after apply)
+      [32m+[0m[0m id               = (known after apply)
+      [32m+[0m[0m owner_id         = (known after apply)
+      [32m+[0m[0m propagating_vgws = (known after apply)
+      [32m+[0m[0m route            = (known after apply)
+      [32m+[0m[0m tags             = {
+          [32m+[0m[0m "Environment" = "test"
+        }
+      [32m+[0m[0m tags_all         = {
+          [32m+[0m[0m "Environment" = "test"
+        }
+      [32m+[0m[0m vpc_id           = "vpc-test"
+    }
+
+[1m  # module.test_vpc.aws_subnet.public[0][0m will be [1m[31mdestroyed[0m
+  # (because index [0] is out of range for count)
+[0m  [31m-[0m[0m resource "aws_subnet" "public" {
+      [31m-[0m[0m arn                                            = "arn:aws:ec2:test_region:test_account_2:subnet/subnet-test" [90m-> null[0m[0m
+      [31m-[0m[0m assign_ipv6_address_on_creation                = false [90m-> null[0m[0m
+      [31m-[0m[0m availability_zone                              = "test" [90m-> null[0m[0m
+      [31m-[0m[0m availability_zone_id                           = "test" [90m-> null[0m[0m
+      [31m-[0m[0m cidr_block                                     = "test" [90m-> null[0m[0m
+      [31m-[0m[0m enable_dns64                                   = false [90m-> null[0m[0m
+      [31m-[0m[0m enable_lni_at_device_index                     = 0 [90m-> null[0m[0m
+      [31m-[0m[0m enable_resource_name_dns_a_record_on_launch    = false [90m-> null[0m[0m
+      [31m-[0m[0m enable_resource_name_dns_aaaa_record_on_launch = false [90m-> null[0m[0m
+      [31m-[0m[0m id                                             = "subnet-test" [90m-> null[0m[0m
+      [31m-[0m[0m ipv6_native                                    = false [90m-> null[0m[0m
+      [31m-[0m[0m map_customer_owned_ip_on_launch                = false [90m-> null[0m[0m
+      [31m-[0m[0m map_public_ip_on_launch                        = false [90m-> null[0m[0m
+      [31m-[0m[0m owner_id                                       = "test_account_2" [90m-> null[0m[0m
+      [31m-[0m[0m private_dns_hostname_type_on_launch            = "ip-name" [90m-> null[0m[0m
+      [31m-[0m[0m tags                                           = {
+          [31m-[0m[0m "Environment"                               = "test"
+        } [90m-> null[0m[0m
+      [31m-[0m[0m tags_all                                       = {
+          [31m-[0m[0m "Environment"                               = "test"
+        } [90m-> null[0m[0m
+      [31m-[0m[0m vpc_id                                         = "vpc-test" [90m-> null[0m[0m
+
+      [31m-[0m[0m timeouts {}
+    }
+
+[1mPlan:[0m 2 to add, 0 to change, 1 to destroy.
+[0m[33m╷[0m[0m
+[33m│[0m [0m[1m[33mWarning: [0m[0m[1mArgument is deprecated[0m
+[33m│[0m [0m
+[33m│[0m [0m[0m  with aws_test_addon.test,
+[33m│[0m [0m  on test-addons.tf line 6, in resource "aws_test_addon" "test":
+[33m│[0m [0m   6:   resolve_conflicts = [4m"OVERWRITE"[0m[0m
+[33m│[0m [0m
+[33m│[0m [0mThe "resolve_conflicts" attribute can't be set to "PRESERVE" on initial
+[33m│[0m [0mresource creation. Use "resolve_conflicts_on_create" and/or
+[33m│[0m [0m"resolve_conflicts_on_update" instead
+[33m│[0m [0m
+[33m│[0m [0m(and 10 more similar warnings elsewhere)
+[33m╵[0m[0m
+[31m╷[0m[0m
+[31m│[0m [0m[1m[31mError: [0m[0m[1mError in function call[0m
+[31m│[0m [0m
+[31m│[0m [0m[0m  on modules/vpc/test.tf line 868, in resource "aws_nat_gateway" "this":
+[31m│[0m [0m 868:   subnet_id = [4melement([0m
+[31m│[0m [0m 869:     aws_subnet.public.*.id,
+[31m│[0m [0m 870:     var.single_nat_gateway ? 0 : count.index,
+[31m│[0m [0m 871:   )[0m
+[31m│[0m [0m    [90m├────────────────[0m
+[31m│[0m [0m[0m    [90m│[0m while calling [1melement[0m([0mlist, index)
+[31m│[0m [0m    [90m│[0m [1maws_subnet.public[0m is empty tuple
+[31m│[0m [0m[0m    [90m│[0m [1mcount.index[0m is 0
+[31m│[0m [0m[0m    [90m│[0m [1mvar.single_nat_gateway[0m is false
+[31m│[0m [0m[0m
+[31m│[0m [0mCall to function "element" failed: cannot use element function with an
+[31m│[0m [0mempty list.
+[31m╵[0m[0m
+[31m╷[0m[0m
+[31m│[0m [0m[1m[31mError: [0m[0m[1mError in function call[0m
+[31m│[0m [0m
+[31m│[0m [0m[0m  on modules/vpc/test.tf line 868, in resource "aws_nat_gateway" "this":
+[31m│[0m [0m 868:   subnet_id = [4melement([0m
+[31m│[0m [0m 869:     aws_subnet.public.*.id,
+[31m│[0m [0m 870:     var.single_nat_gateway ? 0 : count.index,
+[31m│[0m [0m 871:   )[0m
+[31m│[0m [0m    [90m├────────────────[0m
+[31m│[0m [0m[0m    [90m│[0m while calling [1melement[0m([0mlist, index)
+[31m│[0m [0m    [90m│[0m [1maws_subnet.public[0m is empty tuple
+[31m│[0m [0m[0m    [90m│[0m [1mcount.index[0m is 2
+[31m│[0m [0m[0m    [90m│[0m [1mvar.single_nat_gateway[0m is false
+[31m│[0m [0m[0m
+[31m│[0m [0mCall to function "element" failed: cannot use element function with an
+[31m│[0m [0mempty list.
+[31m╵[0m[0m
+[31m╷[0m[0m
+::debug::Terraform exited with code 1.
+::debug::stdout: [0m[1mtest[0m%0A[0m[1m[33m╵[0m[0m%0A
+::debug::stderr: [31m╷[0m[0m%0A[31m│[0m [0m[1m[31mtest[31m╵[0m[0m%0A
+::debug::exitcode: 1
+::error::Terraform exited with code 1.

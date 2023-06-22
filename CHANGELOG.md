@@ -1,5 +1,15 @@
 # Changelog
 
+## v3.0.0
+- Add support for tflint.
+- Remove requirement to run `terraform show` internally and depend on either direct input or directing the `terraform plan` output to a txt file.
+- Add support for adding partial plan to the comment on failure.
+
+## v2.0.0
+- Run `terraform show` internally to bypass github 64k limit.
+- Paginate comments that are greater than 64k characters and delete corresponding paginated comments on each successive rerun.
+- Temporarily swap out red `-` so yaml arrays aren't confused with diff-removal lines.
+
 ## v1.5.0
 
 - Bump to Terraform v1.0.6 internally (only affects `fmt`)

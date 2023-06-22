@@ -1,13 +1,13 @@
-ARG TERRAFORM_VERSION=1.0.6
+ARG TERRAFORM_VERSION=1.4.6
 FROM hashicorp/terraform:${TERRAFORM_VERSION}
 
-LABEL repository="https://github.com/robburger/terraform-pr-commenter" \
-      homepage="https://github.com/robburger/terraform-pr-commenter" \
-      maintainer="Rob Burger" \
+LABEL repository="https://github.com/GetTerminus/terraform-pr-commenter" \
+      homepage="https://github.com/GetTerminus/terraform-pr-commenter" \
+      maintainer="Terminus Software" \
       com.github.actions.name="Terraform PR Commenter" \
-      com.github.actions.description="Adds opinionated comments to a PR from Terraform fmt/init/plan output" \
+      com.github.actions.description="Adds comments to a PR from Terraform fmt/init/plan/tflint output." \
       com.github.actions.icon="git-pull-request" \
-      com.github.actions.color="purple"
+      com.github.actions.color="blue"
 
 RUN apk add --no-cache -q \
     bash \
@@ -16,6 +16,10 @@ RUN apk add --no-cache -q \
     jq
 
 ADD entrypoint.sh /entrypoint.sh
+ADD /handlers /handlers
+ADD /utilities /utilities
 RUN chmod +x /entrypoint.sh
+RUN chmod +x /handlers
+RUN chmod +x /utilities
 
 ENTRYPOINT ["/entrypoint.sh"]
