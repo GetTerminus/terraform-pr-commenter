@@ -8,13 +8,14 @@ Rob Burger](https://github.com/robburger).
 This Docker-based GitHub Action is designed to work in tandem with [hashicorp/setup-terraform](https://github.com/hashicorp/setup-terraform) and [terraform-linters/setup-tflint](https://github.com/terraform-linters/setup-tflint) with the **wrapper enabled**, taking the output from a `fmt`, `init`, `plan`, `validate` or `tflint`, formatting it and adding it to a pull request. Any previous comments from this Action are removed to keep the PR timeline clean.
 
 > The `terraform_wrapper` needs to be set to `true` for the `hashicorp/setup-terraform` step if using `stdout`, `stderr` and the `exitcode` step outputs like the below examples.
+
 > The `tflint_wrapper` needs to be set to `true` for the `terraform-linters/setup-tflint` step if using `stdout`, `stderr` and the `exitcode` step outputs like the below examples.
 
 Support (for now) is [limited to Linux](https://help.github.com/en/actions/creating-actions/about-actions#types-of-actions) as Docker-based GitHub Actions can only be used on Linux runners.
 
 ## Usage
 
-This action can only be run after a Terraform `fmt`, `init`, `plan`, `validate` or `tflint` has completed, and the output has been captured. Terraform rarely writes to `stdout` and `stderr` in the same action, so we concatenate the `commenter_input`. For the plan type commenter we recommend saving the output to a file instead of using stdout/stderr as this allows us to bypass size limits for variables with long plans.
+This action can only be run after a Terraform `fmt`, `init`, `plan`, `validate` or `tflint` has completed, and the output has been captured. Terraform rarely writes to `stdout` and `stderr` in the same action, so the `commenter_input` needs to be concatenated. For the `plan` commenter type we recommend saving the output to a file instead of using stdout/stderr as this allows us to bypass size limits for variables so large terraform plans don't need to be truncated.
 
 Example Workflow:
 
@@ -125,9 +126,17 @@ All of these environment variables can be set at `job` or `step` level. For exam
 ## Notes
 
 * The commenter requires a pull request to run so the github event must contain a `.pull_request.number`.
-* For long terraform plans using stdout/stderr instead of a file as shown above. There is a limit to the size of the `commenter_input` (approx 130000 characters). If your output is larger than that you will need to either truncate or switch the output to a text file.
+* For large terraform plans using stdout/stder, there is a limit to the size of the `commenter_input` (approx 130000 characters). If your output is larger than that you will need to either truncate or switch the output to a text file as shown in the workflow example above.
 
 ## Screenshots
+
+### `plan`
+
+![fmt](images/plan-output.png)
+
+![fmt](images/plan-long-output.png)
+
+![fmt](images/changed-outputs.png)
 
 ### `fmt`
 
@@ -137,17 +146,17 @@ All of these environment variables can be set at `job` or `step` level. For exam
 
 ![fmt](images/init-output.png)
 
-### `plan`
-
-![fmt](images/plan-output.png)
-
 ### `validate`
 
 ![fmt](images/validate-output.png)
 
+### `tflint`
+
+![fmt](images/tflint-output.png)
+
 ## Troubleshooting & Contributing
 
-Feel free to head over to the [Issues](https://github.com/robburger/terraform-pr-commenter/issues) tab to see if the issue you're having has already been reported. If not, [open a new one](https://github.com/robburger/terraform-pr-commenter/issues/new) and be sure to include as much relevant information as possible, including code-samples, and a description of what you expect to be happening.
+Feel free to head over to the [Issues](https://github.com/GetTerminus/terraform-pr-commenter//issues) tab to see if the issue you're having has already been reported. If not, [open a new one](https://github.com/GetTerminus/terraform-pr-commenter/issues/new) and be sure to include as much relevant information as possible, including code-samples, and a description of what you expect to be happening.
 
 ## License
 

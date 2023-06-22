@@ -31,7 +31,7 @@ runs:
     - name: Build Commenter Docker Image (beta)
       if: ${{ inputs.use_beta_version == 'true' }}
       # append branch with a pound (#) if developing.  e.g., `commenter.git#my-branch`
-      run: docker build -t commenter https://github.com/GetTerminus/terraform-pr-commenter.git#dpr-update-commenter
+      run: docker build -t commenter https://github.com/GetTerminus/terraform-pr-commenter.git#v3-beta
       shell: bash
     - name: Run commenter image (plan)
       if: ${{ inputs.commenter_type == 'plan' }}
