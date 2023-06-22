@@ -1,4 +1,4 @@
-name: 'Terraform PR Commenter'
+name: 'Terraform and TFLint PR Commenter'
 description: 'Adds opinionated comments to a PR from Terraform fmt/init/plan/validate/tflint output'
 author: 'Rob Burger'
 branding:
