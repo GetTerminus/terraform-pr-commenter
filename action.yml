@@ -20,7 +20,7 @@ inputs:
   terraform_version:
     description: 'The version of terraform from the workflow.'
     required: false
-    default: "1.4.6"
+    default: '1.4.6'
   use_beta_version:
     description: 'Whether to use the beta version of the commenter'
     required: false
@@ -30,7 +30,7 @@ runs:
   steps:
     - name: Build commenter docker image (master)
       if: ${{ inputs.use_beta_version != 'true' }}
-      run: docker build --build-arg TERRAFORM_VERSION=${{ inputs.terraform_version }} -t commenter https://github.com/GetTerminus/terraform-pr-commenter.git#v3
+      run: docker build --build-arg TERRAFORM_VERSION=${{ inputs.terraform_version }} -t commenter https://github.com/GetTerminus/terraform-pr-commenter.git#dpr-fix-default-version
       shell: bash
     - name: Build commenter docker image (beta)
       if: ${{ inputs.use_beta_version == 'true' }}
