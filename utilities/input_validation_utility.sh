@@ -19,18 +19,4 @@ validate_inputs () {
     error "Unsupported command \"$1\". Valid commands are \"fmt\", \"init\", \"plan\", \"validate\", \"tflint\"."
     exit 1
   fi
-
-  if [[ $1 == "plan" ]]; then
-    if [[ -z "$COMMENTER_INPUT" ]]; then
-      if [[ -z "$COMMENTER_PLAN_FILE" ]]; then
-        error "The commenter_plan_path input variable must be set if commenter_input is empty."
-        exit 1
-      fi
-    fi
-  else
-    if [[ -z "$COMMENTER_INPUT" ]]; then
-      error "The commenter_input input variable must be set for non plan commenter types."
-      exit 1
-    fi
-  fi
 }
