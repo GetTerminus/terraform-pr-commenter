@@ -45,10 +45,7 @@ runs:
       if: ${{ inputs.use_beta_version == 'true' }}
       # append branch with a pound (#) if developing.  e.g., `commenter.git#my-branch`
       run: |
-        echo "test"
-        echo "${{ inputs.terraform_version }}"
-        echo "${{ inputs.use_beta_version }}"
-        docker build --build-arg TERRAFORM_VERSION=${{ steps.tf_version.outputs.version }} -t commenter https://github.com/GetTerminus/terraform-pr-commenter.git#dpr-fix-default-version
+        docker build --build-arg TERRAFORM_VERSION=${{ steps.tf_version.outputs.version }} -t commenter https://github.com/GetTerminus/terraform-pr-commenter.git#v3-beta
       shell: bash
     - name: Run commenter image (plan)
       if: ${{ inputs.commenter_type == 'plan' }}
