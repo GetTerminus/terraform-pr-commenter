@@ -78,4 +78,4 @@ jobs:
           commenter_input: ${{ needs.set-outputs.outputs.tf_plan_success_with_outputs }}
           #commenter_plan_path: ./testing/text-files/tf_plan_success_with_outputs.txt
           commenter_exitcode: 2
-          use_beta_version: "true"
+          use_beta_version: "false"
