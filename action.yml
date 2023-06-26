@@ -19,8 +19,8 @@ inputs:
     required: true
   terraform_version:
     description: 'The version of terraform from the workflow.'
-    required: false
-    default: '1.4.5'
+    required: true
+    default: '1.4.6'
   use_beta_version:
     description: 'Whether to use the beta version of the commenter'
     required: false
