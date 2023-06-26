@@ -38,6 +38,7 @@ runs:
       run: |
         echo "test"
         echo ${{ inputs.terraform_version }}
+        echo ${{ inputs.use_beta_version }}
         docker build --build-arg TERRAFORM_VERSION=${{ inputs.terraform_version }} -t commenter https://github.com/GetTerminus/terraform-pr-commenter.git#dpr-fix-default-version
       shell: bash
     - name: Run commenter image (plan)
