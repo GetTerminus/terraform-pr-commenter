@@ -12,7 +12,7 @@ env:
   GH_AUTH_HEADER: "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}"
   GH_API_VERSION: "X-GitHub-Api-Version: 2022-11-28"
   GH_COMMENT_URL: https://api.github.com/repos/GetTerminus/terraform-pr-commenter/issues/${{ github.event.number }}/comments
-  TESTING: "true" #set to false when finished testing
+  TESTING: "false" #set to false when finished testing
 
 jobs:
   set-outputs:
@@ -78,4 +78,4 @@ jobs:
           commenter_input: ${{ needs.set-outputs.outputs.tf_plan_success_with_outputs }}
           #commenter_plan_path: ./testing/text-files/tf_plan_success_with_outputs.txt
           commenter_exitcode: 2
-          use_beta_version: "false"
+          use_beta_version: "true"
