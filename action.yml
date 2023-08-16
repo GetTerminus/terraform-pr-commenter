@@ -25,6 +25,17 @@ inputs:
     description: 'Whether to use the beta version of the commenter'
     required: false
     default: 'false'
+  project:
+    description: project name to use in the comment
+    required: false
+outputs:
+  comment_id:
+    description: ID of created comment
+    value: ${{ steps.commenter-plan.outputs.comment_id || steps.commenter.outputs.comment_id }}
+  comment_url:
+    description: URL to created comment
+    value: ${{ steps.commenter-plan.outputs.comment_url || steps.commenter.outputs.comment_url }}
+
 runs:
   using: "composite"
   steps:
@@ -49,14 +60,17 @@ runs:
       shell: bash
     - name: Run commenter image (plan)
       if: ${{ inputs.commenter_type == 'plan' }}
+      id: commenter-plan
       env:
         COMMENTER_INPUT: ${{ inputs.commenter_input }}
         COMMENTER_PLAN_FILE: ${{ inputs.commenter_plan_path }}
         GITHUB_EVENT: ${{ toJSON(github.event) }}
+        TF_PROJECT: ${{ inputs.project }}
       run: |
         docker run \
         -e GITHUB_TOKEN \
         -e TF_WORKSPACE \
+        -e TF_PROJECT \
         -e EXPAND_SUMMARY_DETAILS \
         -e HIGHLIGHT_CHANGES \
         -e GITHUB_EVENT \
@@ -66,22 +80,27 @@ runs:
         -e COMMENTER_PLAN_FILE \
         -e COMMENTER_POST_PLAN_OUTPUTS \
         -v "$(pwd)"/:/workspace \
+        -v "$GITHUB_OUTPUT":/github-ouput \
         commenter ${{ inputs.commenter_type }} ${{ inputs.commenter_exitcode }}
       shell: bash
     - name: Run commenter image (non-plan)
       if: ${{ inputs.commenter_type != 'plan' }}
+      id: commenter
       env:
         COMMENTER_INPUT: ${{ inputs.commenter_input }}
         GITHUB_EVENT: ${{ toJSON(github.event) }}
+        TF_PROJECT: ${{ inputs.project }}
       run: |
         docker run \
         -e GITHUB_TOKEN \
         -e TF_WORKSPACE \
+        -e TF_PROJECT \
         -e EXPAND_SUMMARY_DETAILS \
         -e HIGHLIGHT_CHANGES \
         -e GITHUB_EVENT \
         -e COMMENTER_INPUT \
         -e COMMENTER_DEBUG \
         -e COMMENTER_ECHO \
+        -v "$GITHUB_OUTPUT":/github-ouput \
         commenter ${{ inputs.commenter_type }} ${{ inputs.commenter_exitcode }}
       shell: bash

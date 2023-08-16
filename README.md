@@ -111,6 +111,7 @@ jobs:
 | `commenter_exitcode`  | ___required___ | The exit code from a previous step output.                                                                                                                          |
 | `terraform_version`   | ___optional___ | The version of terraform from the workflow. Defaults to `1.4.6`.                                                                                                    |
 | `use_beta_version`    | ___optional___ | Whether or not to use the beta version of the commenter.                                                                                                            |
+| `project`             | ___optional___ | Project name to use in comments header. usefull for monorepos                                                                                                          |
 
 ### Environment Variables
 
@@ -121,6 +122,14 @@ jobs:
 | `EXPAND_SUMMARY_DETAILS` | ___optional___ | Default: `false`. This controls whether the comment output is collapsed or not.                                                                           |
 | `HIGHLIGHT_CHANGES`      | ___optional___ | Default: `true`. This switches `~` to `!` in `plan` diffs to highlight Terraform changes in orange. Set to `false` to disable.                            |
 | `COMMENTER_DEBUG`        | ___optional___ | Default: `false`. This switches the commenter into debug mode.                                                                                            |
+
+### Outputs
+
+| Name | Description |
+|---|---|
+| `comment_id` | ID of comment created by step. Can be used for further manipulations with comment |
+| `comment_url` | URL pointing to comment created by step. Can be used to create a link from summary or to send a notification |
+
 
 ## Notes
 

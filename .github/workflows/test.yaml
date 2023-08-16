@@ -3,6 +3,10 @@ name: Test
 on:
   pull_request:
 
+permissions:
+  checks: write
+  pull-requests: write
+
 env:
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
   TERRAFORM_VERSION: "1.4.6"
@@ -11,8 +15,8 @@ env:
   GH_ACCEPT_HEADER: "Accept: application/vnd.github+json"
   GH_AUTH_HEADER: "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}"
   GH_API_VERSION: "X-GitHub-Api-Version: 2022-11-28"
-  GH_COMMENT_URL: https://api.github.com/repos/GetTerminus/terraform-pr-commenter/issues/${{ github.event.number }}/comments
-  TESTING: "false" #set to false when finished testing
+  GH_COMMENT_URL: https://api.github.com/repos/${{ github.repository }}/issues/${{ github.event.number }}/comments
+  TESTING: "true" #set to false when finished testing
 
 jobs:
   set-outputs:
@@ -71,6 +75,7 @@ jobs:
         if: ${{ env.TESTING == 'true' }}
       - name: Test
         if: ${{ env.TESTING == 'true' }}
+        id: test
         uses: GetTerminus/terraform-pr-commenter@v3-beta #set to your branch for testing and switch back to v3-beta when done.
         with:
           commenter_type: plan
@@ -79,3 +84,16 @@ jobs:
           #commenter_plan_path: ./testing/text-files/tf_plan_success_with_outputs.txt
           commenter_exitcode: 2
           use_beta_version: "true"
+      - name: Test-project-2
+        if: ${{ env.TESTING == 'true' }}
+        uses: GetTerminus/terraform-pr-commenter@v3-beta #set to your branch for testing and switch back to v3-beta when done.
+        with:
+          commenter_type: plan
+          # Should only be setting commenter_input or commenter_plan_path (commenter_plan_path only for plan commenter type)
+          commenter_input: ${{ needs.set-outputs.outputs.tf_plan_success_with_outputs }}
+          #commenter_plan_path: ./testing/text-files/tf_plan_success_with_outputs.txt
+          commenter_exitcode: 2
+          use_beta_version: "true"
+          project: dev-team-2
+      - name: test output
+        run: echo "${{ steps.test.outputs.comment_id }}"

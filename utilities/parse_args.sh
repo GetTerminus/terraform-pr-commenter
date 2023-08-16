@@ -1,25 +1,25 @@
 ##################
 # Shared Variables
 ##################
-parse_args () {
+parse_args() {
   # Arg 1 is command
   COMMAND=$1
   debug "COMMAND: $COMMAND"
 
-  # Arg 3 is the Terraform CLI exit code
+  # Arg 2 is the Terraform CLI exit code
   EXIT_CODE=$2
   debug "EXIT_CODE: $EXIT_CODE"
 
-  # Arg 2 is input file. We strip ANSI colours.
+  # COMMENTER_INPUT is input file. We strip ANSI colours.
   RAW_INPUT="$COMMENTER_INPUT"
   debug "COMMENTER_INPUT: $COMMENTER_INPUT"
 
   if [[ $COMMAND == 'plan' ]]; then
     if test -f "workspace/${COMMENTER_PLAN_FILE}"; then
       info "Found commenter plan file."
-      pushd workspace > /dev/null || (error "Failed to push workspace dir" && exit 1)
-      RAW_INPUT="$( cat "${COMMENTER_PLAN_FILE}" 2>&1 )"
-      popd > /dev/null || (error "Failed to pop workspace dir" && exit 1)
+      pushd workspace >/dev/null || (error "Failed to push workspace dir" && exit 1)
+      RAW_INPUT="$(cat "${COMMENTER_PLAN_FILE}" 2>&1)"
+      popd >/dev/null || (error "Failed to pop workspace dir" && exit 1)
     else
       info "Found no tfplan file. Using input argument."
     fi
@@ -45,6 +45,9 @@ parse_args () {
   # Read TF_WORKSPACE environment variable or use "default"
   # shellcheck disable=SC2034
   WORKSPACE=${TF_WORKSPACE:-default}
+  # Read TF_WORKSPACE environment variable or use ""
+  # shellcheck disable=SC2034
+  PROJECT=${TF_PROJECT:-''}
 
   # Read EXPAND_SUMMARY_DETAILS environment variable or use "true"
   if [[ ${EXPAND_SUMMARY_DETAILS:-false} == "true" ]]; then
