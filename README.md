@@ -72,11 +72,11 @@ jobs:
         commenter_input: ${{ format('{0}{1}', steps.validate.outputs.stdout, steps.validate.outputs.stderr) }}
         commenter_exitcode: ${{ steps.validate.outputs.exitcode }}
     - name: TFLint - Setup
-      id: tflint
       uses: terraform-linters/setup-tflint@v3
       with:
         tflint_wrapper_enabled: true
     - name: TFLint - Run
+      id: tflint
       run: |
         tflint --version
         tflint --init
