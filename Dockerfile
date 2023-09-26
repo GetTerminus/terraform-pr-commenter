@@ -13,7 +13,8 @@ RUN apk add --no-cache -q \
     bash \
     curl \
     perl \
-    jq
+    jq \
+    && apk add --upgrade curl
 
 ADD entrypoint.sh /entrypoint.sh
 ADD /handlers /handlers
