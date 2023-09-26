@@ -39,13 +39,13 @@ runs:
       shell: bash
     - name: Build commenter docker image (master)
       if: ${{ inputs.use_beta_version != 'true' }}
-      run: docker build --build-arg TERRAFORM_VERSION=${{ steps.tf_version.outputs.version }} -t commenter https://github.com/GetTerminus/terraform-pr-commenter.git#dpr-fix-curl
+      run: docker build --build-arg TERRAFORM_VERSION=${{ steps.tf_version.outputs.version }} -t commenter https://github.com/GetTerminus/terraform-pr-commenter.git#v3
       shell: bash
     - name: Build commenter docker image (beta)
       if: ${{ inputs.use_beta_version == 'true' }}
       # append branch with a pound (#) if developing.  e.g., `commenter.git#my-branch`
       run: |
-        docker build --build-arg TERRAFORM_VERSION=${{ steps.tf_version.outputs.version }} -t commenter https://github.com/GetTerminus/terraform-pr-commenter.git#v3-beta
+        docker build --build-arg TERRAFORM_VERSION=${{ steps.tf_version.outputs.version }} -t commenter https://github.com/GetTerminus/terraform-pr-commenter.git#dpr-fix-curl
       shell: bash
     - name: Run commenter image (plan)
       if: ${{ inputs.commenter_type == 'plan' }}
