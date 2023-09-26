@@ -12,8 +12,9 @@ LABEL repository="https://github.com/GetTerminus/terraform-pr-commenter" \
 RUN apk add --no-cache -q \
     bash \
     curl \
+    --upgrade curl \
     perl \
-    jq
+    jq \
 
 ADD entrypoint.sh /entrypoint.sh
 ADD /handlers /handlers
