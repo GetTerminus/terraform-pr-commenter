@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 # shellcheck source=handler/
-for HF in handlers/* ; do source "$HF" ; done
+for HF in handlers/*; do source "$HF"; done
 # shellcheck source=utilities/
-for UF in utilities/* ; do source "$UF" ; done
+for UF in utilities/*; do source "$UF"; done
 
 if [ -n "${COMMENTER_ECHO+x}" ]; then
   set -x

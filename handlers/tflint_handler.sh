@@ -1,4 +1,4 @@
-execute_tflint () {
+execute_tflint() {
   # shellcheck disable=SC2016
   delete_existing_comments 'tflint' '### Linter `TFLint` .* for Workspace: `'"$WORKSPACE"'`.*'
 
@@ -17,14 +17,14 @@ execute_tflint () {
   fi
 }
 
-tflint_success () {
-   info "TFLint completed with no errors. Continuing."
+tflint_success() {
+  info "TFLint completed with no errors. Continuing."
 }
 
-tflint_fail () {
+tflint_fail() {
   local pr_comment
 
-  pr_comment=$(make_details_with_header "Linter \`TFLint\` Failed for Workspace: \`$WORKSPACE\`" "$INPUT")
+  pr_comment=$(make_details_with_header "Linter \`TFLint\` Failed for Workspace: \`$WORKSPACE\` ❌" "$INPUT")
 
   make_and_post_payload "tflint failure" "$pr_comment"
 }

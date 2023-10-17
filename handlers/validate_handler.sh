@@ -1,4 +1,4 @@
-execute_validate () {
+execute_validate() {
   delete_existing_comments "validate" '### Terraform `validate` Failed'
 
   # Exit Code: 0
@@ -16,14 +16,14 @@ execute_validate () {
   fi
 }
 
-validate_success () {
+validate_success() {
   info "Terraform validate completed with no errors. Continuing."
 }
 
-validate_fail () {
+validate_fail() {
   local pr_comment
 
-  pr_comment=$(make_details_with_header "Terraform \`validate\` Failed" "$INPUT" "diff")
+  pr_comment=$(make_details_with_header "Terraform \`validate\` Failed ❌" "$INPUT" "diff")
 
   make_and_post_payload "validate failure" "$pr_comment"
 }
