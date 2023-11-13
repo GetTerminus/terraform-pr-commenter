@@ -98,7 +98,7 @@ jobs:
       with:
         commenter_type: plan
         commenter_plan_path: tf_plan.txt
-        commenter_exitcode: ${{ steps.plan.outputs.exit }}
+        commenter_exitcode: ${{ steps.plan.outputs.exitcode }}
 ```
 
 ### Inputs
