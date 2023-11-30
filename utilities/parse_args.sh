@@ -58,6 +58,8 @@ parse_args () {
   # shellcheck disable=SC2034
   COLOURISE=${HIGHLIGHT_CHANGES:-true}
 
+  # support multiple-module plan outputs (e.g., when running Terragrunt)
+  MULTIPLE_MODULES=${COMMENTER_MULTIPLE_MODULES:-true}
   # Read COMMENTER_POST_PLAN_OUTPUTS environment variable or use "true"
   # shellcheck disable=SC2034
   POST_PLAN_OUTPUTS=${COMMENTER_POST_PLAN_OUTPUTS:-true}

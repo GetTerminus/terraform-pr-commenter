@@ -17,6 +17,10 @@ inputs:
   commenter_exitcode:
     description: 'The exit code from a previous step output'
     required: true
+  multiple_modules:
+    description: 'Support multiple modules (do not cut off after first plan)'
+    required: false
+    default: 'false'
   terraform_version:
     description: 'The version of terraform from the workflow.'
     required: false
@@ -51,6 +55,7 @@ runs:
       if: ${{ inputs.commenter_type == 'plan' }}
       env:
         COMMENTER_INPUT: ${{ inputs.commenter_input }}
+        COMMENTER_MULTIPLE_MODULES: ${{ inputs.multiple_modules }}
         COMMENTER_PLAN_FILE: ${{ inputs.commenter_plan_path }}
         GITHUB_EVENT: ${{ toJSON(github.event) }}
       run: |
@@ -63,6 +68,7 @@ runs:
         -e COMMENTER_INPUT \
         -e COMMENTER_DEBUG \
         -e COMMENTER_ECHO \
+        -e COMMENTER_MULTIPLE_MODULES \
         -e COMMENTER_PLAN_FILE \
         -e COMMENTER_POST_PLAN_OUTPUTS \
         -v "$(pwd)"/:/workspace \
