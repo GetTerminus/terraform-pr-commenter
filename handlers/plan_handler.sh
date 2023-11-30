@@ -60,7 +60,9 @@ post_plan_comments () {
   debug "delimiter_end_cmd: $delimiter_end_cmd"
 
   clean_input=$(echo "$INPUT" | perl -pe "${delimiter_start_cmd}")
-  clean_input=$(echo "$clean_input" | sed -r "${delimiter_end_cmd}")
+  if [[ $MULTIPLE_MODULES != 'true' ]]; then
+    clean_input=$(echo "$clean_input" | sed -r "${delimiter_end_cmd}")
+  fi
 
   post_diff_comments "plan" "Terraform \`plan\` Succeeded for Workspace: \`$WORKSPACE\`" "$clean_input"
 }
