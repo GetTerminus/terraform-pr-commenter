@@ -75,7 +75,7 @@ jobs:
       id: tflint
       uses: terraform-linters/setup-tflint@v3
       with:
-        tflint_wrapper_enabled: true
+        tflint_wrapper: true
     - name: TFLint - Run
       run: |
         tflint --version
