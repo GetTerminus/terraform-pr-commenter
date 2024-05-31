@@ -1,9 +1,9 @@
 validate_inputs () {
-  PR_NUMBER=$(echo "$GITHUB_EVENT" | jq -r ".pull_request.number")
-  if [[ "$PR_NUMBER" == "null" ]]; then
-    error "This isn't a PR."
-    exit 0
-  fi
+  # PR_NUMBER=$(echo "$GITHUB_EVENT" | jq -r ".pull_request.number")
+  # if [[ "$PR_NUMBER" == "null" ]]; then
+  #   error "This isn't a PR."
+  #   exit 0
+  # fi
 
   if [[ -z "$GITHUB_TOKEN" ]]; then
     error "GITHUB_TOKEN environment variable missing."

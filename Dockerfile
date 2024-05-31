@@ -1,8 +1,8 @@
 ARG TERRAFORM_VERSION=1.4.6
 FROM hashicorp/terraform:${TERRAFORM_VERSION}
 
-LABEL repository="https://github.com/GetTerminus/terraform-pr-commenter" \
-      homepage="https://github.com/GetTerminus/terraform-pr-commenter" \
+LABEL repository="https://github.com/deliveryhero/terraform-pr-commenter" \
+      homepage="https://github.com/deliveryhero/terraform-pr-commenter" \
       maintainer="Terminus Software" \
       com.github.actions.name="Terraform PR Commenter" \
       com.github.actions.description="Adds comments to a PR from Terraform fmt/init/plan/tflint output." \
