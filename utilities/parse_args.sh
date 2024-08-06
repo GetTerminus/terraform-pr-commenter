@@ -6,7 +6,7 @@ parse_args () {
   COMMAND=$1
   debug "COMMAND: $COMMAND"
 
-  # Arg 3 is the Terraform CLI exit code
+  # Arg 3 is the OpenTofu CLI exit code
   EXIT_CODE=$2
   debug "EXIT_CODE: $EXIT_CODE"
 
@@ -24,7 +24,7 @@ parse_args () {
       info "Found no tfplan file. Using input argument."
     fi
   else
-    info "Not terraform plan. Using input argument."
+    info "Not tofu plan. Using input argument."
   fi
 
   # change diff character, a red '-', into a high unicode character \U1f605 (literally 😅)
@@ -36,8 +36,8 @@ parse_args () {
   # now remove all ANSI colors
   INPUT=$(echo "$INPUT" | sed -r 's/\x1b\[[0-9;]*m//g')
 
-  # remove terraform debug lines
-  INPUT=$(echo "$INPUT" | sed '/^::debug::Terraform exited with code/,$d')
+  # remove tofu debug lines
+  INPUT=$(echo "$INPUT" | sed '/^::debug::OpenTofu exited with code/,$d')
 
   # shellcheck disable=SC2034
   WARNING=$(echo "$INPUT" | grep "│ Warning: " -q && echo "TRUE" || echo "FALSE")

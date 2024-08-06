@@ -1,6 +1,6 @@
-name: 'Terraform and TFLint PR Commenter'
-description: 'Adds opinionated comments to a PR from Terraform fmt/init/plan/validate/tflint output'
-author: 'GetTerminus'
+name: 'OpenTofu and TFLint PR Commenter'
+description: 'Adds opinionated comments to a PR from OpenTofu fmt/init/plan/validate/tflint output'
+author: 'phoenix-actions'
 branding:
   icon: 'git-pull-request'
   color: 'blue'
@@ -17,10 +17,10 @@ inputs:
   commenter_exitcode:
     description: 'The exit code from a previous step output'
     required: true
-  terraform_version:
+  tofu_version:
     description: 'The version of terraform from the workflow.'
     required: false
-    default: '1.4.6'
+    default: '1.8.0'
   use_beta_version:
     description: 'Whether to use the beta version of the commenter'
     required: false
@@ -28,24 +28,24 @@ inputs:
 runs:
   using: "composite"
   steps:
-    - name: Set Terraform Version if inputs.terraform_version is Empty # Until https://github.com/actions/runner/issues/924 is fixed
+    - name: Set OpenTofu Version if inputs.terraform_version is Empty # Until https://github.com/actions/runner/issues/924 is fixed
       id: tf_version
       run: |
-        if [[ -z ${{ inputs.terraform_version }} ]]; then
-          echo "version=1.4.6" >> $GITHUB_OUTPUT
+        if [[ -z ${{ inputs.tofu_version }} ]]; then
+          echo "version=1.8.0" >> $GITHUB_OUTPUT
         else
-          echo "version=${{ inputs.terraform_version }}" >> $GITHUB_OUTPUT
+          echo "version=${{ inputs.tofu_version }}" >> $GITHUB_OUTPUT
         fi
       shell: bash
     - name: Build commenter docker image (master)
       if: ${{ inputs.use_beta_version != 'true' }}
-      run: docker build --build-arg TERRAFORM_VERSION=${{ steps.tf_version.outputs.version }} -t commenter https://github.com/GetTerminus/terraform-pr-commenter.git#dpr-fix-curl
+      run: docker build --build-arg TOFU_VERSION=${{ steps.tf_version.outputs.version }} -t commenter https://github.com/phoenix-actions/terraform-pr-commenter.git#dpr-fix-curl
       shell: bash
     - name: Build commenter docker image (beta)
       if: ${{ inputs.use_beta_version == 'true' }}
       # append branch with a pound (#) if developing.  e.g., `commenter.git#my-branch`
       run: |
-        docker build --build-arg TERRAFORM_VERSION=${{ steps.tf_version.outputs.version }} -t commenter https://github.com/GetTerminus/terraform-pr-commenter.git#v3-beta
+        docker build --build-arg TOFU_VERSION=${{ steps.tf_version.outputs.version }} -t commenter https://github.com/phoenix-actions/terraform-pr-commenter.git#v3-beta
       shell: bash
     - name: Run commenter image (plan)
       if: ${{ inputs.commenter_type == 'plan' }}

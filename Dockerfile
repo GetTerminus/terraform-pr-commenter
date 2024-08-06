@@ -1,11 +1,11 @@
-ARG TERRAFORM_VERSION=1.4.6
-FROM hashicorp/terraform:${TERRAFORM_VERSION}
+ARG TOFU_VERSION=1.8.0
+FROM docker pull ghcr.io/opentofu/opentofu:${TOFU_VERSION}
 
-LABEL repository="https://github.com/GetTerminus/terraform-pr-commenter" \
-      homepage="https://github.com/GetTerminus/terraform-pr-commenter" \
-      maintainer="Terminus Software" \
-      com.github.actions.name="Terraform PR Commenter" \
-      com.github.actions.description="Adds comments to a PR from Terraform fmt/init/plan/tflint output." \
+LABEL repository="https://github.com/phoenix-actions/opentofu-pr-commenter" \
+      homepage="https://github.com/phoenix-actions/opentofu-pr-commenter" \
+      maintainer="Phoenix Actions" \
+      com.github.actions.name="OpenTofu PR Commenter" \
+      com.github.actions.description="Adds comments to a PR from OpenTofu fmt/init/plan/tflint output." \
       com.github.actions.icon="git-pull-request" \
       com.github.actions.color="blue"
 
