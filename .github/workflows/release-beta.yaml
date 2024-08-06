@@ -7,7 +7,7 @@ jobs:
   release-beta:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
       - name: Set Beta Git tag
         uses: weareyipyip/walking-tag-action@v2
         with:
