@@ -37,7 +37,7 @@ runs:
           echo "version=${{ inputs.tofu_version }}" >> $GITHUB_OUTPUT
         fi
       shell: bash
-    - name: Build commenter docker image (master)
+    - name: Build commenter docker image (main)
       if: ${{ inputs.use_beta_version != 'true' }}
       run: docker build --build-arg TOFU_VERSION=${{ steps.tf_version.outputs.version }} -t commenter https://github.com/phoenix-actions/opentofu-pr-commenter.git#dpr-fix-curl
       shell: bash
