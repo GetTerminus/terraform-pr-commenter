@@ -1,4 +1,4 @@
-[command]/home/runner/work/_temp/7befa20f-0a52-46e8-a3d1-31deb8143268/terraform-bin plan -var-file=vars/test.tfvars -var-file=vars/test-vpc.tfvars -var-file=vars/test.tfvars -lock=false -input=false
+[command]/home/runner/work/_temp/7befa20f-0a52-46e8-a3d1-31deb8143268/tofu-bin plan -var-file=vars/test.tfvars -var-file=vars/test-vpc.tfvars -var-file=vars/test.tfvars -lock=false -input=false
 [0m[1mrandom_pet.test: Refreshing state... [id=test][0m
 [0m[1mdata.github_team.owner: Reading...[0m[0m
 [0m[1mdata.aws_caller_identity.test: Reading...[0m[0m
@@ -9,7 +9,7 @@
 
 [0m[1m[32mNo changes.[0m[1m Your infrastructure matches the configuration.[0m
 
-[0mTerraform has compared your real infrastructure against your configuration
+[0mOpenTofu has compared your real infrastructure against your configuration
 and found no differences, so no changes are needed.
 [33m╷[0m[0m
 [33m│[0m [0m[1m[33mWarning: [0m[0m[1mArgument is deprecated[0m
@@ -24,7 +24,7 @@ and found no differences, so no changes are needed.
 [33m│[0m [0m
 [33m│[0m [0m(and 9 more similar warnings elsewhere)
 [33m╵[0m[0m
-::debug::Terraform exited with code 0.
+::debug::OpenTofu exited with code 0.
 ::debug::stdout: [0m[1mtest%0A[33m╵[0m[0m%0A
 ::debug::stderr: 
 ::debug::exitcode: 0

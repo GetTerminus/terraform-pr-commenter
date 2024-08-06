@@ -1,4 +1,4 @@
-[command]/home/runner/work/_temp/99227165-25f1-4d41-a47a-e8aaf3591c9d/terraform-bin plan -var-file=vars/test.tfvars -var-file=vars/test-vpc.tfvars -var-file=vars/test.tfvars -lock=false -input=false
+[command]/home/runner/work/_temp/99227165-25f1-4d41-a47a-e8aaf3591c9d/tofu-bin plan -var-file=vars/test.tfvars -var-file=vars/test-vpc.tfvars -var-file=vars/test.tfvars -lock=false -input=false
 [0m[1mrandom_pet.test: Refreshing state... [id=test][0m
 [0m[1mdata.github_team.owner: Reading...[0m[0m
 [0m[1mdata.aws_caller_identity.test: Reading...[0m[0m
@@ -20,12 +20,12 @@
 [0m[1maws_secretsmanager_secret.pagerduty_api_token[0]: Refreshing state... [id=arn:aws:secretsmanager:test_region:test_account_2:secret:pagerduty-api-token-bRH21U][0m
 [0m[1mdata.aws_region.current: Read complete after 0s [id=test_region][0m
 
-Terraform used the selected providers to generate the following execution
+OpenTofu used the selected providers to generate the following execution
 plan. Resource actions are indicated with the following symbols:
   [32m+[0m create[0m
   [31m-[0m destroy[0m
 
-Terraform planned the following actions, but then encountered a problem:
+OpenTofu planned the following actions, but then encountered a problem:
 
 [1m  # module.test_vpc.aws_eip.nat[3][0m will be created
 [0m  [32m+[0m[0m resource "aws_eip" "nat" {
@@ -146,8 +146,8 @@ Terraform planned the following actions, but then encountered a problem:
 [31m│[0m [0mempty list.
 [31m╵[0m[0m
 [31m╷[0m[0m
-::debug::Terraform exited with code 1.
+::debug::OpenTofu exited with code 1.
 ::debug::stdout: [0m[1mtest[0m%0A[0m[1m[33m╵[0m[0m%0A
 ::debug::stderr: [31m╷[0m[0m%0A[31m│[0m [0m[1m[31mtest[31m╵[0m[0m%0A
 ::debug::exitcode: 1
-::error::Terraform exited with code 1.
+::error::OpenTofu exited with code 1.

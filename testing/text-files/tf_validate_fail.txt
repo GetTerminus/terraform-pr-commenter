@@ -1,4 +1,4 @@
-[command]/home/runner/work/_temp/1ae545d0-53d7-4d7f-87ed-ec0b0d7a74e4/terraform-bin validate
+[command]/home/runner/work/_temp/1ae545d0-53d7-4d7f-87ed-ec0b0d7a74e4/tofu-bin validate
 [33m╷[0m[0m
 [33m│[0m [0m[1m[33mWarning: [0m[0m[1mArgument is deprecated[0m
 [33m│[0m [0m
@@ -20,8 +20,8 @@
 [31m│[0m [0mFor example, to correlate with indices of a referring resource, use:
 [31m│[0m [0m    aws_security_group.test[count.index]
 [31m╵[0m[0m
-::debug::Terraform exited with code 1.
+::debug::OpenTofu exited with code 1.
 ::debug::stdout: [33m╷[0m[0m%0A[33m│[0m [0m[1m[33mtest%0A[33m╵[0m[0m%0A
 ::debug::stderr: [31m╷[0m[0m%0A[31m│[0m [0m[1m[31mtest%0A[31m╵[0m[0m%0A
 ::debug::exitcode: 1
-::error::Terraform exited with code 1.
+::error::OpenTofu exited with code 1.
