@@ -1,5 +1,5 @@
 ARG TOFU_VERSION=1.8.0
-FROM docker pull ghcr.io/opentofu/opentofu:${TOFU_VERSION}
+FROM ghcr.io/opentofu/opentofu:${TOFU_VERSION}
 
 LABEL repository="https://github.com/phoenix-actions/opentofu-pr-commenter" \
       homepage="https://github.com/phoenix-actions/opentofu-pr-commenter" \
