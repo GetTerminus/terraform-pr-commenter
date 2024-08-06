@@ -15,6 +15,7 @@ jobs:
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           release_branches: "main"
+          default_bump: major
       - uses: sersoft-gmbh/running-release-tags-action@v1
         with:
           tag: ${{ steps.tag_version.outputs.new_tag }}
