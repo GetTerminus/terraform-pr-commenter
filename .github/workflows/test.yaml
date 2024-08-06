@@ -43,7 +43,7 @@ jobs:
           - "tf_validate_fail"
           - "tflint_fail"
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         if: ${{ env.TESTING == 'true' }}
       - name: Set Test Outputs
         if: ${{ env.TESTING == 'true' }}
@@ -67,7 +67,7 @@ jobs:
     runs-on: ubuntu-latest
     needs: set-outputs
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         if: ${{ env.TESTING == 'true' }}
       - name: Test
         if: ${{ env.TESTING == 'true' }}
