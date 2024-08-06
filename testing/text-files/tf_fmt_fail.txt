@@ -1,4 +1,4 @@
-[command]/home/runner/work/_temp/f916c738-a3f9-416c-a411-6fad2d709557/terraform-bin fmt -check -recursive -diff
+[command]/home/runner/work/_temp/f916c738-a3f9-416c-a411-6fad2d709557/tofu-bin fmt -check -recursive -diff
 test.tf
 --- old/test.tf
 +++ new/test.tf
@@ -20,8 +20,8 @@ vars/test.tfvars
  test_cluster_security_group_name = "test"
 -test_cluster_iam_role_name       =                            "test"
 +test_cluster_iam_role_name       = "test"
-::debug::Terraform exited with code 3.
+::debug::OpenTofu exited with code 3.
 ::debug::stdout: test.tf%0A--- old/test.tf%0A+++ new/test.tf%0A@@ -161,7 +161,7 @@%0A       ebs_optimized = true%0A       vpc_security_group_ids = [%0A         aws_security_group.test[0].id,%0A-           ]%0A+      ]%0A %0A       block_device_mappings = {%0A         xvda = {%0Avars/test.tfvars%0A--- old/vars/test.tfvars%0A+++ new/vars/test.tfvars%0A@@ -17,4 +17,4 @@%0A %0A cluster_iam_role_path           = "/"%0A test_cluster_security_group_name = "test"%0A-test_cluster_iam_role_name       =                            "test       = "test"%0A
 ::debug::stderr: 
 ::debug::exitcode: 3
-::error::Terraform exited with code 3.
+::error::OpenTofu exited with code 3.

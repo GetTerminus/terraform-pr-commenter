@@ -1,6 +1,6 @@
 3 issue(s) found:
 
-Warning: [Fixable] Interpolation-only expressions are deprecated in Terraform v0.12.14 (terraform_deprecated_interpolation)
+Warning: [Fixable] Interpolation-only expressions are deprecated in OpenTofu v0.12.14 (tofu_deprecated_interpolation)
 
   on outputs.tf line 53:
   53:   value = ["${aws_s3_bucket.test.*.bucket}"]

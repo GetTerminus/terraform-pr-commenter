@@ -1,4 +1,4 @@
-[command]/home/runner/work/_temp/f263be63-0b7e-409b-94d8-678062bf2600/terraform-bin plan -var-file=vars/test.tfvars -var-file=vars/test-vpc.tfvars -var-file=vars/test.tfvars -lock=false -input=false
+[command]/home/runner/work/_temp/f263be63-0b7e-409b-94d8-678062bf2600/tofu-bin plan -var-file=vars/test.tfvars -var-file=vars/test-vpc.tfvars -var-file=vars/test.tfvars -lock=false -input=false
 [0m[1mrandom_pet.test: Refreshing state... [id=test][0m
 [0m[1mdata.github_team.owner: Reading...[0m[0m
 [0m[1mdata.aws_test_cluster.selected: Reading...[0m[0m
@@ -10,11 +10,11 @@
 [0m[1mmodule.test_vpc.data.aws_vpc_endpoint_service.dynamodb[0]: Reading...[0m[0m
 [0m[1mmodule.test[0].module.kms.data.aws_partition.current: Read complete after 0s [id=aws][0m
 
-Terraform used the selected providers to generate the following execution
+OpenTofu used the selected providers to generate the following execution
 plan. Resource actions are indicated with the following symbols:
   [32m+[0m create[0m
 
-Terraform will perform the following actions:
+OpenTofu will perform the following actions:
 
 [1m  # aws_s3_bucket.test[0m will be created
 [0m  [32m+[0m[0m resource "aws_s3_bucket" "test" {
@@ -54,9 +54,9 @@ Terraform will perform the following actions:
 [90m
 ─────────────────────────────────────────────────────────────────────────────[0m
 
-Note: You didn't use the -out option to save this plan, so Terraform can't
-guarantee to take exactly these actions if you run "terraform apply" now.
-::debug::Terraform exited with code 0.
+Note: You didn't use the -out option to save this plan, so OpenTofu can't
+guarantee to take exactly these actions if you run "tofu apply" now.
+::debug::OpenTofu exited with code 0.
 ::debug::stdout: [0m[1mtest%0A
 ::debug::stderr: 
 ::debug::exitcode: 0

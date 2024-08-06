@@ -1,13 +1,12 @@
-# Terraform PR Commenter
+# OpenTofu PR Commenter
 
-> This project was forked from <https://github.com/robburger/terraform-pr-commenter> project, originally created by [
-Rob Burger](https://github.com/robburger).
+> This project was forked from <https://github.com/GetTerminus/terraform-pr-commenter> project, which was originally forked from <https://github.com/robburger/terraform-pr-commenter> project, originally created by [Rob Burger](https://github.com/robburger).
 
 ## Summary
 
-This Docker-based GitHub Action is designed to work in tandem with [hashicorp/setup-terraform](https://github.com/hashicorp/setup-terraform) and [terraform-linters/setup-tflint](https://github.com/terraform-linters/setup-tflint) with the **wrapper enabled**, taking the output from a `fmt`, `init`, `plan`, `validate` or `tflint`, formatting it and adding it to a pull request. Any previous comments from this Action are removed to keep the PR timeline clean.
+This Docker-based GitHub Action is designed to work in tandem with [opentofu/setup-opentofu](https://github.com/opentofu/setup-opentofu) and [terraform-linters/setup-tflint](https://github.com/terraform-linters/setup-tflint) with the **wrapper enabled**, taking the output from a `fmt`, `init`, `plan`, `validate` or `tflint`, formatting it and adding it to a pull request. Any previous comments from this Action are removed to keep the PR timeline clean.
 
-> The `terraform_wrapper` needs to be set to `true` for the `hashicorp/setup-terraform` step if using `stdout`, `stderr` and the `exitcode` step outputs like the below examples.
+> The `tofu_wrapper` needs to be set to `true` for the `opentofu/setup-opentofu` step if using `stdout`, `stderr` and the `exitcode` step outputs like the below examples.
 
 > The `tflint_wrapper` needs to be set to `true` for the `terraform-linters/setup-tflint` step if using `stdout`, `stderr` and the `exitcode` step outputs like the below examples.
 
@@ -15,12 +14,12 @@ Support (for now) is [limited to Linux](https://help.github.com/en/actions/creat
 
 ## Usage
 
-This action can only be run after a Terraform `fmt`, `init`, `plan`, `validate` or `tflint` has completed, and the output has been captured. Terraform rarely writes to `stdout` and `stderr` in the same action, so the `commenter_input` needs to be concatenated. For the `plan` commenter type we recommend saving the output to a file instead of using stdout/stderr as this allows us to bypass size limits for variables so large terraform plans don't need to be truncated.
+This action can only be run after a tofu `fmt`, `init`, `plan`, `validate` or `tflint` has completed, and the output has been captured. OpenTofu rarely writes to `stdout` and `stderr` in the same action, so the `commenter_input` needs to be concatenated. For the `plan` commenter type we recommend saving the output to a file instead of using stdout/stderr as this allows us to bypass size limits for variables so large tofu plans don't need to be truncated.
 
 Example Workflow:
 
 ```yaml
-name: Terraform
+name: OpenTofu
 
 on:
   pull_request:
@@ -28,52 +27,52 @@ on:
 env:
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
   TF_WORKSPACE: "example"
-  TF_VERSION: "1.4.6"
+  TF_VERSION: "1.8.0"
 
 jobs:
-  terraform:
-    name: Run Terraform and Comment
+  tofu:
+    name: Run OpenTofu and Comment
     runs-on: ubuntu-latest
   steps:
-    - name: HashiCorp - Setup Terraform
-      uses: hashicorp/setup-terraform@v2
+    - name: Setup OpenTofu
+      uses: opentofu/setup-opentofu@v2
       with:
-        terraform_version: ${{ env.TF_VERSION }}
-    - name: Terraform Format
+        tofu_version: ${{ env.TF_VERSION }}
+    - name: Tofu Format
       id: fmt
       run: |
-        terraform fmt -check -recursive -diff
+        tofu fmt -check -recursive -diff
       continue-on-error: true
     - name: Post Format Comment
       if: ${{ always() && (steps.fmt.outcome == 'success' || steps.fmt.outcome == 'failure') }}
-      uses: GetTerminus/terraform-pr-commenter@v3
+      uses: phoenix-actions/opentofu-pr-commenter@v1
       with:
         commenter_type: fmt
         commenter_input: ${{ format('{0}{1}', steps.fmt.outputs.stdout, steps.fmt.outputs.stderr) }}
         commenter_exitcode: ${{ steps.fmt.outputs.exitcode }}
-    - name: Terraform Init
+    - name: Tofu Init
       id: init
-      run: terraform init -lock=false -input=false
+      run: tofu init -lock=false -input=false
     - name: Post Init Comment
       if: ${{ always() && (steps.init.outcome == 'success' || steps.init.outcome == 'failure') }}
-      uses: GetTerminus/terraform-pr-commenter@v3
+      uses: phoenix-actions/opentofu-pr-commenter@v1
       with:
         commenter_type: init
         commenter_input: ${{ format('{0}{1}', steps.init.outputs.stdout, steps.init.outputs.stderr) }}
         commenter_exitcode: ${{ steps.init.outputs.exitcode }}
-    - name: Terraform Validate
+    - name: Tofu Validate
       id: validate
-      run: terraform validate
+      run: tofu validate
     - name: Post TF Validate Comment
       if: ${{ always() && (steps.validate.outcome == 'success' || steps.validate.outcome == 'failure') }}
-      uses: GetTerminus/terraform-pr-commenter@v3
+      uses: phoenix-actions/opentofu-pr-commenter@v1
       with:
         commenter_type: validate
         commenter_input: ${{ format('{0}{1}', steps.validate.outputs.stdout, steps.validate.outputs.stderr) }}
         commenter_exitcode: ${{ steps.validate.outputs.exitcode }}
     - name: TFLint - Setup
       id: tflint
-      uses: terraform-linters/setup-tflint@v3
+      uses: terraform-linters/setup-tflint@v4
       with:
         tflint_wrapper_enabled: true
     - name: TFLint - Run
@@ -83,18 +82,18 @@ jobs:
         tflint
     - name: Post TFLint Comment
       if: ${{ always() && (steps.tflint.outcome == 'success' || steps.tflint.outcome == 'failure') }}
-      uses: GetTerminus/terraform-pr-commenter@dpr-update-commenter
+      uses: phoenix-actions/opentofu-pr-commenter@v1
       with:
         commenter_type: tflint
         commenter_input: ${{ format('{0}{1}', steps.tflint.outputs.stdout, steps.tflint.outputs.stderr) }}
         commenter_exitcode: ${{ steps.tflint.outputs.exitcode }}
-    - name: Terraform Plan
+    - name: Tofu Plan
       id: plan
-      run: terraform plan -lock=false -input=false |& tee tf_plan.txt
-    - uses: GetTerminus/terraform-pr-commenter@v3
+      run: tofu plan -lock=false -input=false |& tee tf_plan.txt
+    - uses: phoenix-actions/opentofu-pr-commenter@v1
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        TF_WORKSPACE: ${{ inputs.terraform_workspace }}
+        TF_WORKSPACE: ${{ inputs.tofu_workspace }}
       with:
         commenter_type: plan
         commenter_plan_path: tf_plan.txt
@@ -109,7 +108,7 @@ jobs:
 | `commenter_input`     | ___optional___ | The comment to post from a previous step output. For plan commenter type either `commenter_input` or `commenter_plan_path` must be set. _This is limited to 128KiB_ |
 | `commenter_plan_path` | ___optional___ | The plan file path including the filename. Only available for plan commenter types.                                                                                 |
 | `commenter_exitcode`  | ___required___ | The exit code from a previous step output.                                                                                                                          |
-| `terraform_version`   | ___optional___ | The version of terraform from the workflow. Defaults to `1.4.6`.                                                                                                    |
+| `tofu_version`   | ___optional___ | The version of OpenTofu from the workflow. Defaults to `1.8.0`.                                                                                                    |
 | `use_beta_version`    | ___optional___ | Whether or not to use the beta version of the commenter.                                                                                                            |
 
 ### Environment Variables
@@ -119,13 +118,13 @@ jobs:
 | `GITHUB_TOKEN`           | ___required___ | Used to execute API calls. The `${{ secrets.GITHUB_TOKEN }}` already has permissions, but if you're using your own token, ensure it has the `repo` scope. |
 | `TF_WORKSPACE`           | ___optional___ | Default: `default`. This is used to separate multiple comments on a pull request in a matrix run.                                                         |
 | `EXPAND_SUMMARY_DETAILS` | ___optional___ | Default: `false`. This controls whether the comment output is collapsed or not.                                                                           |
-| `HIGHLIGHT_CHANGES`      | ___optional___ | Default: `true`. This switches `~` to `!` in `plan` diffs to highlight Terraform changes in orange. Set to `false` to disable.                            |
+| `HIGHLIGHT_CHANGES`      | ___optional___ | Default: `true`. This switches `~` to `!` in `plan` diffs to highlight OpenTofu changes in orange. Set to `false` to disable.                            |
 | `COMMENTER_DEBUG`        | ___optional___ | Default: `false`. This switches the commenter into debug mode.                                                                                            |
 
 ## Notes
 
 * The commenter requires a pull request to run so the github event must contain a `.pull_request.number`.
-* For large terraform plans using stdout/stder, there is aproximately  128KiB limit to the size of the `commenter_input`. If your output is larger than that you will need to either truncate or switch the output to a text file as shown in the workflow example above. An example of how to truncate the plan output is shown below.
+* For large tofu plans using stdout/stder, there is aproximately  128KiB limit to the size of the `commenter_input`. If your output is larger than that you will need to either truncate or switch the output to a text file as shown in the workflow example above. An example of how to truncate the plan output is shown below.
 
 Example TF Plan Truncate:
 
@@ -139,8 +138,8 @@ Example TF Plan Truncate:
     # copy the stdout file handle to fd5.
     exec 5>&1
 
-    # merge stderr into stdout and print it to fd5 (parent shell's stdout); exit with the code from terraform plan
-    OUTPUT=$(terraform plan -lock=false -input=false 2>&1 | tee /dev/fd/5; exit ${PIPESTATUS[0]})
+    # merge stderr into stdout and print it to fd5 (parent shell's stdout); exit with the code from tofu plan
+    OUTPUT=$(tofu plan -lock=false -input=false 2>&1 | tee /dev/fd/5; exit ${PIPESTATUS[0]})
 
     # store the exit code here
     EXITCODE=$?
@@ -184,7 +183,7 @@ Example TF Plan Truncate:
 
 ## Troubleshooting & Contributing
 
-Feel free to head over to the [Issues](https://github.com/GetTerminus/terraform-pr-commenter//issues) tab to see if the issue you're having has already been reported. If not, [open a new one](https://github.com/GetTerminus/terraform-pr-commenter/issues/new) and be sure to include as much relevant information as possible, including code-samples, and a description of what you expect to be happening.
+Feel free to head over to the [Issues](https://github.com/phoenix-actions/opentofu-pr-commenter//issues) tab to see if the issue you're having has already been reported. If not, [open a new one](https://github.com/phoenix-actions/opentofu-pr-commenter/issues/new) and be sure to include as much relevant information as possible, including code-samples, and a description of what you expect to be happening.
 
 ## License
 

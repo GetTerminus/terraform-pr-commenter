@@ -1,4 +1,4 @@
-[command]/home/runner/work/_temp/f32b90ae-4c39-475f-9c04-a29ad035e7a3/terraform-bin plan -var-file=vars/test.tfvars -var-file=vars/test-vpc.tfvars -var-file=vars/test.tfvars -lock=false -input=false
+[command]/home/runner/work/_temp/f32b90ae-4c39-475f-9c04-a29ad035e7a3/tofu-bin plan -var-file=vars/test.tfvars -var-file=vars/test-vpc.tfvars -var-file=vars/test.tfvars -lock=false -input=false
 [0m[1mrandom_pet.test: Refreshing state... [id=test][0m
 [0m[1mdata.github_team.owner: Reading...[0m[0m
 [0m[1mdata.aws_caller_identity.test: Reading...[0m[0m
@@ -34,7 +34,7 @@
 [0m[1mmodule.test_vpc.data.aws_vpc_endpoint_service.dynamodb[0]: Reading...[0m[0m
 [0m[1mmodule.test[0].data.aws_default_tags.current: Reading...[0m[0m
 
-[0m[1m[31mPlanning failed.[0m[1m Terraform encountered an error while generating this plan.[0m
+[0m[1m[31mPlanning failed.[0m[1m OpenTofu encountered an error while generating this plan.[0m
 
 [0m[33m╷[0m[0m
 [33m│[0m [0m[1m[33mWarning: [0m[0m[1mArgument is deprecated[0m
@@ -66,8 +66,8 @@
 [31m│[0m [0m
 [31m╵[0m[0m
 [31m╷[0m[0m
-::debug::Terraform exited with code 1.
+::debug::OpenTofu exited with code 1.
 ::debug::stdout: [0m[1mrandom_pet.test: Refreshing state... [id=test][0m%0A[0m[1mdata.github_team.owner: Reading...[0m[0m%0A[0m[33m╵[0m[0m%0A
 ::debug::stderr: [31m╷[0m[0m%0A[31m│[0m [0m[1m[31mError: [0m[0m[1mUnauthorized[0m%0A[31m│[0m [0m%0A[31m│[0m [0m[0m  with kubernetes_cluster_role.test[0],%0A[31m│[0m [0m  on test.tf line 18, in resource "kubernetes_cluster_role" "test":%0A[31m│[0m [0m  18: resource "kubernetes_cluster_role" "test" [4m{[0m[0m%0A[31m│[0m [0m%0A[31m╵[0m[0m%0A[31m╷[0m[0m%0A[31m│[0m [0m[1m[31m[0m[0m%0A
 ::debug::exitcode: 1
-::error::Terraform exited with code 1.
+::error::OpenTofu exited with code 1.
