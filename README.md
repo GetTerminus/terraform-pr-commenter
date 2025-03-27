@@ -46,7 +46,7 @@ jobs:
       continue-on-error: true
     - name: Post Format Comment
       if: ${{ always() && (steps.fmt.outcome == 'success' || steps.fmt.outcome == 'failure') }}
-      uses: GetTerminus/terraform-pr-commenter@v3
+      uses: DEFRA/cdp-terraform-pr-commenter
       with:
         commenter_type: fmt
         commenter_input: ${{ format('{0}{1}', steps.fmt.outputs.stdout, steps.fmt.outputs.stderr) }}
@@ -56,7 +56,7 @@ jobs:
       run: terraform init -lock=false -input=false
     - name: Post Init Comment
       if: ${{ always() && (steps.init.outcome == 'success' || steps.init.outcome == 'failure') }}
-      uses: GetTerminus/terraform-pr-commenter@v3
+      uses: DEFRA/cdp-terraform-pr-commenter
       with:
         commenter_type: init
         commenter_input: ${{ format('{0}{1}', steps.init.outputs.stdout, steps.init.outputs.stderr) }}
@@ -66,7 +66,7 @@ jobs:
       run: terraform validate
     - name: Post TF Validate Comment
       if: ${{ always() && (steps.validate.outcome == 'success' || steps.validate.outcome == 'failure') }}
-      uses: GetTerminus/terraform-pr-commenter@v3
+      uses: DEFRA/cdp-terraform-pr-commenter
       with:
         commenter_type: validate
         commenter_input: ${{ format('{0}{1}', steps.validate.outputs.stdout, steps.validate.outputs.stderr) }}
@@ -83,7 +83,7 @@ jobs:
         tflint
     - name: Post TFLint Comment
       if: ${{ always() && (steps.tflint.outcome == 'success' || steps.tflint.outcome == 'failure') }}
-      uses: GetTerminus/terraform-pr-commenter@dpr-update-commenter
+      uses: DEFRA/cdp-terraform-pr-commenter
       with:
         commenter_type: tflint
         commenter_input: ${{ format('{0}{1}', steps.tflint.outputs.stdout, steps.tflint.outputs.stderr) }}
@@ -91,7 +91,7 @@ jobs:
     - name: Terraform Plan
       id: plan
       run: terraform plan -lock=false -input=false |& tee tf_plan.txt
-    - uses: GetTerminus/terraform-pr-commenter@v3
+    - uses: DEFRA/cdp-terraform-pr-commenter
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         TF_WORKSPACE: ${{ inputs.terraform_workspace }}
@@ -184,7 +184,7 @@ Example TF Plan Truncate:
 
 ## Troubleshooting & Contributing
 
-Feel free to head over to the [Issues](https://github.com/GetTerminus/terraform-pr-commenter//issues) tab to see if the issue you're having has already been reported. If not, [open a new one](https://github.com/GetTerminus/terraform-pr-commenter/issues/new) and be sure to include as much relevant information as possible, including code-samples, and a description of what you expect to be happening.
+Feel free to head over to the [Issues](https://github.com/DEFRA/cdp-terraform-pr-commenter//issues) tab to see if the issue you're having has already been reported. If not, [open a new one](https://DEFRA/cdp-terraform-pr-commenter/issues/new) and be sure to include as much relevant information as possible, including code-samples, and a description of what you expect to be happening.
 
 ## License
 
