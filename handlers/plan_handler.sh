@@ -1,4 +1,4 @@
-execute_plan () {
+execute_plan() {
   # shellcheck disable=SC2016
   delete_existing_comments 'plan' '### Terraform `plan` .* for Workspace: `'"$WORKSPACE"'`.*'
   delete_existing_comments 'outputs' '### Changes to outputs for Workspace: `'"$WORKSPACE"'`.*'
@@ -18,14 +18,14 @@ execute_plan () {
   fi
 }
 
-plan_success () {
+plan_success() {
   post_plan_comments
   if [[ $POST_PLAN_OUTPUTS == 'true' ]]; then
     post_outputs_comments
   fi
 }
 
-plan_fail () {
+plan_fail() {
   local clean_input
   local delimiter_start_cmd
   local delimiter_start_strings=()
@@ -39,10 +39,10 @@ plan_fail () {
 
   clean_input=$(echo "$INPUT" | perl -pe "${delimiter_start_cmd}")
 
-  post_diff_comments "plan" "Terraform \`plan\` Failed for Workspace: \`$WORKSPACE\`" "$clean_input"
+  post_diff_comments "plan" "Terraform \`plan\` Failed for Workspace: \`$WORKSPACE\` ❌" "$clean_input"
 }
 
-post_plan_comments () {
+post_plan_comments() {
   local clean_input
   local delimiter_start_strings=()
   local delimiter_start_cmd
@@ -62,7 +62,7 @@ post_plan_comments () {
   clean_input=$(echo "$INPUT" | perl -pe "${delimiter_start_cmd}")
   clean_input=$(echo "$clean_input" | sed -r "${delimiter_end_cmd}")
 
-  post_diff_comments "plan" "Terraform \`plan\` Succeeded for Workspace: \`$WORKSPACE\`" "$clean_input"
+  post_diff_comments "plan" "Terraform \`plan\` Succeeded for Workspace: \`$WORKSPACE\` ✅" "$clean_input"
 }
 
 post_outputs_comments() {
@@ -82,5 +82,5 @@ post_outputs_comments() {
   clean_input=$(echo "$INPUT" | perl -pe "${delimiter_start_cmd}")
   clean_input=$(echo "$clean_input" | sed -r "${delimiter_end_cmd}")
 
-  post_diff_comments "outputs" "Changes to outputs for Workspace: \`$WORKSPACE\`" "$clean_input"
+  post_diff_comments "outputs" "Changes to outputs for Workspace: \`$WORKSPACE\` ⚠️" "$clean_input"
 }
